@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+html,
+body,
+#root {
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  background-color: #070c18;
+  color: #c8d8f0;
+}
+
+.font-display {
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.font-mono-data {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #1a2f52;
+  border-radius: 2px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1a2f52 transparent;
+}
+
+.graph-grid-bg {
+  background-color: #060b16;
+  background-image:
+    linear-gradient(rgba(26, 47, 82, 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26, 47, 82, 0.4) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.node-glow-red { filter: drop-shadow(0 0 6px rgba(239,68,68,0.6)); }
+.node-glow-blue { filter: drop-shadow(0 0 6px rgba(59,130,246,0.6)); }
+.node-glow-green { filter: drop-shadow(0 0 6px rgba(16,185,129,0.6)); }
+.node-glow-orange { filter: drop-shadow(0 0 6px rgba(249,115,22,0.6)); }
+.node-glow-purple { filter: drop-shadow(0 0 6px rgba(139,92,246,0.6)); }
+.node-glow-cyan { filter: drop-shadow(0 0 6px rgba(6,182,212,0.6)); }
+.node-glow-gray { filter: drop-shadow(0 0 6px rgba(148,163,184,0.6)); }
