@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Search, User, Phone, CreditCard, MapPin, FileText, Monitor, Building2 } from "lucide-react";
-import { entities, type Entity, type EntityType } from "../lib/mockData";
+import { type Entity, type EntityType } from "../lib/mockData";
 import EntityInspector from "../components/EntityInspector";
+import { useGlobalState } from "../lib/store";
 
 const TYPE_COLOR: Record<string, string> = {
   person: "#ef4444", phone: "#3b82f6", upi: "#10b981", bank: "#10b981",
@@ -15,6 +16,7 @@ const TYPE_ICON: Record<string, React.ElementType> = {
 const FILTER_TYPES: (EntityType | "all")[] = ["all", "person", "phone", "upi", "bank", "location", "device", "fir", "organization"];
 
 export default function Entities() {
+  const { entities } = useGlobalState();
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<EntityType | "all">("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);

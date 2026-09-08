@@ -131,3 +131,24 @@ export async function getDashboardKPIs() {
   await delay(100);
   return dashboardKPIs;
 }
+
+
+
+// src/lib/api.ts
+export async function uploadAndAnalyzeDocuments(files: FileList | File[]) {
+  const formData = new FormData();
+  for (const file of files) {
+    formData.append('files', file);
+  }
+
+  const response = await fetch('http://localhost:8000/api/analyze', {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to analyze documents on the server.');
+  }
+
+  return await response.json();
+}

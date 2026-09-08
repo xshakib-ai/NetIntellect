@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Search, Filter, ChevronDown, ArrowRight } from "lucide-react";
-import { entities, graphNodes } from "../lib/mockData";
+import { type GraphNode, type GraphEdge } from "../lib/mockData";
 import NetworkGraph from "../components/NetworkGraph";
+import { useGlobalState } from "../lib/store";
 import EntityInspector from "../components/EntityInspector";
 
 const ENTITY_TYPES = ["All", "Person", "Phone", "UPI", "Bank", "Location", "FIR", "Device", "Organization"];
@@ -12,6 +13,7 @@ const shortestPath = {
 };
 
 export default function NetworkGraphPage() {
+  const { nodes, edges, entities } = useGlobalState();
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
   const [searchEntity, setSearchEntity] = useState("");
   const [typeFilter, setTypeFilter] = useState("All");
@@ -86,6 +88,8 @@ export default function NetworkGraphPage() {
             selectedEntityId={selectedEntityId ?? undefined}
             onSelectEntity={(id) => setSelectedEntityId(id)}
             height={undefined as unknown as number}
+            nodes={nodes}
+            edges={edges}
           />
 
           {/* Shortest Path Panel */}

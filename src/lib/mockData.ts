@@ -84,6 +84,8 @@ export interface Evidence {
   status: EvidenceStatus;
   size: string;
   extractedEntities: { type: string; count: number }[];
+  rawEntities?: { type: string; values: string[] }[];
+  graphData?: { nodes: GraphNode[]; edges: GraphEdge[] };
 }
 
 export interface AuditEntry {
