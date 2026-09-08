@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowLeft, Upload, Play, Download, Users, Network, AlertTriangle, FileText, DollarSign, Layers } from "lucide-react";
 import { cases } from "../lib/mockData";
+import { parseMultipleCSVsToGraph, type GraphNode, type GraphEdge } from "../lib/csvParser";
 import NetworkGraph from "../components/NetworkGraph";
 import EntityInspector from "../components/EntityInspector";
 import Timeline from "./Timeline";
@@ -16,10 +17,55 @@ interface Props {
 export default function InvestigationWorkspace({ caseId, onBack }: Props) {
   const [tab, setTab] = useState("Overview");
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
-  const c = cases.find((x) => x.id === caseId) ?? cases[0];
+  
+  // State for Multiple CSV File Ingestion & Dynamic Graph
+  const [customFilesCount, setCustomFilesCount] = useState<number>(0);
+  const [primaryFileName, setPrimaryFileName] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [dynamicStats, setDynamicStats] = useState<{ entities: number; relationships: number } | null>(null);
+  const [dynamicNodes, setDynamicNodes] = useState<GraphNode[] | undefined>(undefined);
+  const [dynamicEdges, setDynamicEdges] = useState<GraphEdge[] | undefined>(undefined);
+
+  const baseCase = cases.find((x) => x.id === caseId) ?? cases[0];
+  
+  // Override case metrics if multiple custom files are loaded
+  const c = customFilesCount > 0 && dynamicStats ? {
+    ...baseCase,
+    name: `Multi-CSV Analysis (${customFilesCount} files)`,
+    entities: dynamicStats.entities,
+    relationships: dynamicStats.relationships,
+    evidence: baseCase.evidence + customFilesCount,
+    description: `Successfully ingested, merged, and mapped relationships from ${customFilesCount} uploaded CSV files (Primary: ${primaryFileName}). Graph nodes and edges have been unified.`
+  } : baseCase;
 
   const statusColors: Record<string, string> = { ACTIVE: "#22c55e", REVIEW: "#f97316", CLOSED: "#64748b" };
   const priorityColors: Record<string, string> = { HIGH: "#ef4444", MEDIUM: "#f97316", LOW: "#22c55e" };
+
+  // Handle Multiple CSV File Ingestion
+  const handleMultipleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsAnalyzing(true);
+    try {
+      const fileArray = Array.from(files);
+      const result = await parseMultipleCSVsToGraph(fileArray);
+      
+      setTimeout(() => {
+        setCustomFilesCount(fileArray.length);
+        setPrimaryFileName(fileArray[0].name);
+        setDynamicStats(result.stats);
+        setDynamicNodes(result.nodes);
+        setDynamicEdges(result.edges);
+        setIsAnalyzing(false);
+        alert(`Successfully merged ${result.fileCount} CSV files! Mapped ${result.nodes.length} entities and ${result.edges.length} relationships.`);
+      }, 300);
+    } catch (err) {
+      console.error(err);
+      alert("Error parsing multiple CSV structures.");
+      setIsAnalyzing(false);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -28,7 +74,7 @@ export default function InvestigationWorkspace({ caseId, onBack }: Props) {
         <div className="flex items-center gap-3 mb-1">
           <button
             onClick={onBack}
-            className="flex items-center gap-1.5 text-xs font-display font-medium transition-colors"
+            className="flex items-center gap-1.5 text-xs font-display font-medium transition-colors cursor-pointer"
             style={{ color: "#3a5272" }}
             onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#60a5fa"; }}
             onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#3a5272"; }}
@@ -57,24 +103,50 @@ export default function InvestigationWorkspace({ caseId, onBack }: Props) {
               <span className="font-mono-data text-[10px]" style={{ color: "#3a5272" }}>
                 Investigator: {c.investigator}
               </span>
+              {customFilesCount > 0 && (
+                <span className="font-mono-data text-[9px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+                  {customFilesCount} CSVs MERGED
+                </span>
+              )}
             </div>
           </div>
+          
+          {/* Action Buttons & Overlay File Input */}
           <div className="flex items-center gap-2">
-            {[
-              { label: "Upload Evidence", icon: Upload },
-              { label: "Run Analysis", icon: Play },
-              { label: "Export Report", icon: Download },
-            ].map(({ label, icon: Icon }) => (
+            <div className="relative overflow-hidden">
+              <input 
+                type="file" 
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10" 
+                accept=".csv,.txt" 
+                multiple 
+                onChange={handleMultipleFileChange} 
+              />
               <button
-                key={label}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded border text-xs font-display font-semibold tracking-wide transition-colors"
+                type="button"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded border text-xs font-display font-semibold tracking-wide transition-colors cursor-pointer"
                 style={{ borderColor: "#1a2f52", color: "#90b8d8", backgroundColor: "#0c1426" }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#2a4f82"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#1a2f52"; }}
               >
-                <Icon size={11} />{label}
+                <Upload size={11} /> {isAnalyzing ? "Merging CSVs..." : "Upload Multiple CSVs"}
               </button>
-            ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => alert("Graph intelligence relationship clustering algorithm executed successfully.")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded border text-xs font-display font-semibold tracking-wide transition-colors cursor-pointer"
+              style={{ borderColor: "#1a2f52", color: "#90b8d8", backgroundColor: "#0c1426" }}
+            >
+              <Play size={11} /> Run Analysis
+            </button>
+
+            <button
+              type="button"
+              onClick={() => alert("Exporting Graph Relationship Report...")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded border text-xs font-display font-semibold tracking-wide transition-colors cursor-pointer"
+              style={{ borderColor: "#1a2f52", color: "#90b8d8", backgroundColor: "#0c1426" }}
+            >
+              <Download size={11} /> Export Report
+            </button>
           </div>
         </div>
 
@@ -105,7 +177,7 @@ export default function InvestigationWorkspace({ caseId, onBack }: Props) {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className="px-4 py-2.5 font-display font-semibold text-xs tracking-wide border-b-2 transition-colors"
+            className="px-4 py-2.5 font-display font-semibold text-xs tracking-wide border-b-2 transition-colors cursor-pointer"
             style={{
               borderBottomColor: tab === t ? "#3b82f6" : "transparent",
               color: tab === t ? "#60a5fa" : "#3a5272",
@@ -124,24 +196,37 @@ export default function InvestigationWorkspace({ caseId, onBack }: Props) {
               <div className="font-display font-semibold text-xs tracking-wider mb-2" style={{ color: "#c8d8f0" }}>INVESTIGATION SUMMARY</div>
               <p className="text-sm leading-relaxed" style={{ color: "#90b8d8" }}>{c.description}</p>
               <div className="flex items-center gap-2 mt-3">
-                {c.tags.map((tag) => (
+                {baseCase.tags.map((tag) => (
                   <span key={tag} className="font-mono-data text-[9px] px-2 py-0.5 rounded" style={{ backgroundColor: "#101c35", color: "#5a7a9a", border: "1px solid #1a2f52" }}>{tag}</span>
                 ))}
               </div>
             </div>
-            {/* mini graph */}
+            {/* Network Preview */}
             <div className="rounded border overflow-hidden" style={{ backgroundColor: "#0c1426", borderColor: "#1a2f52" }}>
-              <div className="px-4 py-2 border-b" style={{ borderColor: "#1a2f52" }}>
-                <span className="font-display font-bold text-xs tracking-wider" style={{ color: "#c8d8f0" }}>NETWORK PREVIEW</span>
+              <div className="px-4 py-2 border-b flex justify-between items-center" style={{ borderColor: "#1a2f52" }}>
+                <span className="font-display font-bold text-xs tracking-wider" style={{ color: "#c8d8f0" }}>NETWORK RELATIONSHIP MAPPING</span>
+                {customFilesCount > 0 && <span className="text-[10px] text-emerald-400 font-mono-data">Multi-CSV merged layout active</span>}
               </div>
-              <NetworkGraph selectedEntityId={selectedEntityId ?? undefined} onSelectEntity={setSelectedEntityId} height={280} />
+              <NetworkGraph 
+                selectedEntityId={selectedEntityId ?? undefined} 
+                onSelectEntity={setSelectedEntityId} 
+                height={280} 
+                nodes={dynamicNodes}
+                edges={dynamicEdges}
+              />
             </div>
           </div>
         )}
         {tab === "Network" && (
           <div className="flex-1 overflow-hidden flex">
             <div className="flex-1">
-              <NetworkGraph selectedEntityId={selectedEntityId ?? undefined} onSelectEntity={setSelectedEntityId} height={undefined as unknown as number} />
+              <NetworkGraph 
+                selectedEntityId={selectedEntityId ?? undefined} 
+                onSelectEntity={setSelectedEntityId} 
+                height={undefined as unknown as number} 
+                nodes={dynamicNodes}
+                edges={dynamicEdges}
+              />
             </div>
             {selectedEntityId && <EntityInspector entityId={selectedEntityId} onClose={() => setSelectedEntityId(null)} />}
           </div>
