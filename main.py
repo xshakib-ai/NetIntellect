@@ -91,7 +91,8 @@ async def analyze_documents(files: List[UploadFile] = File(...)):
             else:
                 continue # Skip unsupported formats gracefully
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Error parsing file {filename}: {str(e)}")
+            print(f"Error parsing file {filename}: {str(e)}")
+            continue # Skip this file and process the others
             
         entities = extract_entities(file_text)
         

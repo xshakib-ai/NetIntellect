@@ -121,7 +121,12 @@ export default function Evidence() {
       });
 
       if (!response.ok) {
-        throw new Error(`Upload failed: ${response.statusText}`);
+        let errMsg = `Upload failed: ${response.statusText}`;
+        try {
+          const errData = await response.json();
+          if (errData.detail) errMsg = `Upload failed: ${errData.detail}`;
+        } catch { }
+        throw new Error(errMsg);
       }
 
       const data = await response.json();
@@ -240,9 +245,9 @@ export default function Evidence() {
           edges: [...globalEdges, ...globalStore.edges]
         });
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error analyzing files:", err);
-      alert("Failed to upload/analyze files.");
+      alert(err.message || "Failed to upload/analyze files.");
     } finally {
       setUploading(false);
     }
