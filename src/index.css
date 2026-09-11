@@ -3,13 +3,85 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import 'tailwindcss';
 
+/* ============================================
+   DARK THEME (default)
+   ============================================ */
+:root {
+  --bg-base:        #070c18;
+  --bg-surface:     #0c1426;
+  --bg-raised:      #101c35;
+  --bg-hover:       #0c1a2e;
+  --bg-deep:        #060b16;
+  --bg-input:       #0c1426;
+  --bg-overlay:     rgba(7,12,24,0.85);
+  --bg-status-ok:   #0a1f0a;
+  --border:         #1a2f52;
+  --border-focus:   #2a4f82;
+  --border-subtle:  #0f1c32;
+  --text-primary:   #e2f0ff;
+  --text-secondary: #c8d8f0;
+  --text-muted:     #5a7a9a;
+  --text-faint:     #3a5272;
+  --text-xfaint:    #2a4060;
+  --accent:         #60a5fa;
+  --accent-bg:      #1a3a6b;
+  --accent-hover:   #2a4f9a;
+  --nav-active-bg:  #0f2040;
+  --nav-active-text:#60a5fa;
+  --nav-hover-bg:   #0c1a2e;
+  --nav-hover-text: #90b8d8;
+  --btn-primary-bg: #1d3a7a;
+  --btn-primary-fg: #c8e0ff;
+  --scrollbar:      #1a2f52;
+  --grid-line:      rgba(26, 47, 82, 0.4);
+  --status-ok-text: #22c55e;
+}
+
+/* ============================================
+   LIGHT THEME
+   ============================================ */
+[data-theme="light"] {
+  --bg-base:        #fafafa;
+  --bg-surface:     #ffffff;
+  --bg-raised:      #f5f7ff;
+  --bg-hover:       #eef0f8;
+  --bg-deep:        #f0f2fa;
+  --bg-input:       #ffffff;
+  --bg-overlay:     rgba(250,250,250,0.85);
+  --bg-status-ok:   #f0fdf4;
+  --border:         #e5e7eb;
+  --border-focus:   #a5b4fc;
+  --border-subtle:  #f3f4f6;
+  --text-primary:   #111827;
+  --text-secondary: #374151;
+  --text-muted:     #6b7280;
+  --text-faint:     #9ca3af;
+  --text-xfaint:    #d1d5db;
+  --accent:         #6d5bff;
+  --accent-bg:      #ede9fe;
+  --accent-hover:   #7c6bff;
+  --nav-active-bg:  #ede9fe;
+  --nav-active-text:#6d5bff;
+  --nav-hover-bg:   #f5f3ff;
+  --nav-hover-text: #7c6bff;
+  --btn-primary-bg: #6d5bff;
+  --btn-primary-fg: #ffffff;
+  --scrollbar:      #d1d5db;
+  --grid-line:      rgba(200, 200, 230, 0.5);
+  --status-ok-text: #16a34a;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
 html,
 body,
 #root {
   height: 100%;
   font-family: 'Inter', sans-serif;
-  background-color: #070c18;
-  color: #c8d8f0;
+  background-color: var(--bg-base);
+  color: var(--text-secondary);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .font-display {
@@ -20,6 +92,11 @@ body,
   font-family: 'JetBrains Mono', monospace;
 }
 
+[data-theme="light"] .font-mono-data {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.01em;
+}
+
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -28,20 +105,20 @@ body,
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1a2f52;
+  background: var(--scrollbar);
   border-radius: 2px;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #1a2f52 transparent;
+  scrollbar-color: var(--scrollbar) transparent;
 }
 
 .graph-grid-bg {
-  background-color: #060b16;
+  background-color: var(--bg-deep);
   background-image:
-    linear-gradient(rgba(26, 47, 82, 0.4) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(26, 47, 82, 0.4) 1px, transparent 1px);
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
@@ -59,10 +136,10 @@ body,
   100% { transform: translateY(100vh); }
 }
 
-.node-glow-red { filter: drop-shadow(0 0 6px rgba(239,68,68,0.6)); }
-.node-glow-blue { filter: drop-shadow(0 0 6px rgba(59,130,246,0.6)); }
-.node-glow-green { filter: drop-shadow(0 0 6px rgba(16,185,129,0.6)); }
+.node-glow-red    { filter: drop-shadow(0 0 6px rgba(239,68,68,0.6)); }
+.node-glow-blue   { filter: drop-shadow(0 0 6px rgba(59,130,246,0.6)); }
+.node-glow-green  { filter: drop-shadow(0 0 6px rgba(16,185,129,0.6)); }
 .node-glow-orange { filter: drop-shadow(0 0 6px rgba(249,115,22,0.6)); }
 .node-glow-purple { filter: drop-shadow(0 0 6px rgba(139,92,246,0.6)); }
-.node-glow-cyan { filter: drop-shadow(0 0 6px rgba(6,182,212,0.6)); }
-.node-glow-gray { filter: drop-shadow(0 0 6px rgba(148,163,184,0.6)); }
+.node-glow-cyan   { filter: drop-shadow(0 0 6px rgba(6,182,212,0.6)); }
+.node-glow-gray   { filter: drop-shadow(0 0 6px rgba(148,163,184,0.6)); }

@@ -30,14 +30,14 @@ const ACTION_COLORS: Record<string, string> = {
 export default function AuditLog() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "#1a2f52" }}>
+      <div className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0" style={{ borderColor: "var(--border)" }}>
         <div>
-          <h1 className="font-display font-bold text-xl tracking-wider" style={{ color: "#e2f0ff" }}>AUDIT LOG</h1>
+          <h1 className="font-display font-bold text-xl tracking-wider" style={{ color: "var(--text-primary)" }}>AUDIT LOG</h1>
           <div className="flex items-center gap-3 mt-0.5">
-            <span className="font-mono-data text-xs" style={{ color: "#3a5272" }}>Immutable chain · {auditLog.length} entries</span>
+            <span className="font-mono-data text-xs" style={{ color: "var(--text-faint)" }}>Immutable chain · {auditLog.length} entries</span>
             <span
               className="font-mono-data text-[9px] px-2 py-0.5 rounded border tracking-wider"
-              style={{ borderColor: "#22c55e30", color: "#22c55e", backgroundColor: "#0a1f0a" }}
+              style={{ borderColor: "rgba(34,197,94,0.3)", color: "var(--status-ok-text)", backgroundColor: "var(--bg-status-ok)" }}
             >
               CHAIN INTEGRITY: VERIFIED
             </span>
@@ -48,20 +48,20 @@ export default function AuditLog() {
       <div className="flex-1 overflow-y-auto p-6">
         {/* Hash chain visualization */}
         <div
-          className="rounded border p-3 mb-6 flex items-center gap-3 overflow-x-auto"
-          style={{ backgroundColor: "#0c1426", borderColor: "#1a2f52" }}
+          className="rounded-2xl border p-3 mb-6 flex items-center gap-3 overflow-x-auto"
+          style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
         >
-          <span className="font-display text-[10px] tracking-widest flex-shrink-0" style={{ color: "#3a5272" }}>BLOCK CHAIN:</span>
+          <span className="font-display text-[10px] tracking-widest flex-shrink-0" style={{ color: "var(--text-faint)" }}>BLOCK CHAIN:</span>
           {auditLog.filter((a) => a.hash).map((a, i, arr) => (
             <div key={a.id} className="flex items-center gap-2 flex-shrink-0">
               <div
                 className="font-mono-data text-[8px] px-2 py-1 rounded border"
-                style={{ backgroundColor: "#070c18", borderColor: "#22c55e30", color: "#22c55e" }}
+                style={{ backgroundColor: "var(--bg-base)", borderColor: "rgba(34,197,94,0.3)", color: "var(--status-ok-text)" }}
               >
                 {a.hash}
               </div>
               {i < arr.length - 1 && (
-                <div className="h-px w-6" style={{ backgroundColor: "#1a2f52" }} />
+                <div className="h-px w-6" style={{ backgroundColor: "var(--border)" }} />
               )}
             </div>
           ))}
@@ -75,15 +75,15 @@ export default function AuditLog() {
             return (
               <div
                 key={entry.id}
-                className="flex items-start gap-4 rounded border p-3 transition-colors"
-                style={{ backgroundColor: "#0c1426", borderColor: "#1a2f52" }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "#2a4f82"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "#1a2f52"; }}
+                className="flex items-start gap-4 rounded-xl border p-3 transition-colors"
+                style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "0 1px 4px rgba(0,0,0,0.02)" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border-focus)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)"; }}
               >
                 {/* Index + time */}
                 <div className="flex-shrink-0 w-12 text-right">
-                  <div className="font-mono-data text-[8px]" style={{ color: "#2a4060" }}>#{String(i + 1).padStart(3, "0")}</div>
-                  <div className="font-mono-data text-[10px]" style={{ color: "#3a5272" }}>{entry.time}</div>
+                  <div className="font-mono-data text-[8px]" style={{ color: "var(--text-xfaint)" }}>#{String(i + 1).padStart(3, "0")}</div>
+                  <div className="font-mono-data text-[10px]" style={{ color: "var(--text-faint)" }}>{entry.time}</div>
                 </div>
 
                 {/* Icon */}
@@ -97,25 +97,25 @@ export default function AuditLog() {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-display font-semibold text-sm" style={{ color: "#c8d8f0" }}>{entry.action}</span>
+                    <span className="font-display font-semibold text-sm" style={{ color: "var(--text-secondary)" }}>{entry.action}</span>
                     {entry.caseId && (
-                      <span className="font-mono-data text-[9px] px-1.5 py-0.5 rounded" style={{ backgroundColor: "#101c35", color: "#60a5fa", border: "1px solid #1a2f52" }}>
+                      <span className="font-mono-data text-[9px] px-1.5 py-0.5 rounded" style={{ backgroundColor: "var(--bg-raised)", color: "var(--accent)", border: "1px solid var(--border)" }}>
                         {entry.caseId}
                       </span>
                     )}
                   </div>
-                  <div className="text-xs mt-0.5" style={{ color: "#5a7a9a" }}>{entry.details}</div>
+                  <div className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>{entry.details}</div>
                   {entry.hash && (
                     <div className="flex items-center gap-1.5 mt-1">
-                      <Hash size={9} color="#22c55e" />
-                      <span className="font-mono-data text-[8px]" style={{ color: "#22c55e" }}>{entry.hash}</span>
+                      <Hash size={9} style={{ color: "var(--status-ok-text)" }} />
+                      <span className="font-mono-data text-[8px]" style={{ color: "var(--status-ok-text)" }}>{entry.hash}</span>
                     </div>
                   )}
                 </div>
 
                 {/* Actor */}
                 <div className="flex-shrink-0 text-right">
-                  <div className="font-mono-data text-[9px]" style={{ color: "#5a7a9a" }}>{entry.actor}</div>
+                  <div className="font-mono-data text-[9px]" style={{ color: "var(--text-muted)" }}>{entry.actor}</div>
                 </div>
               </div>
             );

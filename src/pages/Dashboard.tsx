@@ -47,23 +47,23 @@ export default function Dashboard({ onNavigate }: Props) {
         {/* Page header */}
         <div
           className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0"
-          style={{ borderColor: "#1a2f52" }}
+          style={{ borderColor: "var(--border)" }}
         >
           <div>
             <div className="flex items-center gap-3 mb-0.5">
-              <h1 className="font-display font-bold text-xl tracking-wider" style={{ color: "#e2f0ff" }}>
+              <h1 className="font-display font-bold text-xl tracking-wider" style={{ color: "var(--text-primary)" }}>
                 COMMAND CENTER
               </h1>
               <span
                 className="font-mono-data text-[9px] px-2 py-0.5 rounded border tracking-wider"
-                style={{ borderColor: "#1a3a6b", color: "#60a5fa", backgroundColor: "#0a1428" }}
+                style={{ borderColor: "var(--border)", color: "var(--accent)", backgroundColor: "var(--accent-bg)" }}
               >
                 DEMO DATA
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="font-mono-data text-xs" style={{ color: "#60a5fa" }}>CASE-2026-001 / ACTIVE INVESTIGATION</span>
-              <span className="font-mono-data text-[10px]" style={{ color: "#3a5272" }}>
+              <span className="font-mono-data text-xs" style={{ color: "var(--accent)" }}>CASE-2026-001 / ACTIVE INVESTIGATION</span>
+              <span className="font-mono-data text-[10px]" style={{ color: "var(--text-faint)" }}>
                 <Clock size={10} className="inline mr-1" />Last updated: Today, 12:42 PM
               </span>
             </div>
@@ -72,17 +72,17 @@ export default function Dashboard({ onNavigate }: Props) {
             <button
               onClick={() => onNavigate("evidence")}
               className="flex items-center gap-2 px-3 py-1.5 rounded border text-xs font-display font-semibold tracking-wide transition-colors"
-              style={{ borderColor: "#1a2f52", color: "#90b8d8", backgroundColor: "#0c1426" }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#2a4f82"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#1a2f52"; }}
+              style={{ borderColor: "var(--border)", color: "var(--text-secondary)", backgroundColor: "var(--bg-surface)" }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-focus)"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"; }}
             >
               <Upload size={12} />Upload Evidence
             </button>
             <button
               className="flex items-center gap-2 px-3 py-1.5 rounded text-xs font-display font-bold tracking-wide transition-colors"
-              style={{ backgroundColor: "#1d3a7a", color: "#c8e0ff" }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#2a4f9a"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#1d3a7a"; }}
+              style={{ backgroundColor: "var(--btn-primary-bg)", color: "var(--btn-primary-fg)", borderRadius: "9999px" }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--accent-hover)"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--btn-primary-bg)"; }}
             >
               <Plus size={12} />New Investigation
             </button>
@@ -97,10 +97,11 @@ export default function Dashboard({ onNavigate }: Props) {
               return (
                 <div
                   key={key}
-                  className="rounded border p-3 transition-all duration-300"
+                  className="rounded-2xl border p-3 transition-all duration-300"
                   style={{
-                    backgroundColor: "#0c1426",
-                    borderColor: "#1a2f52",
+                    backgroundColor: "var(--bg-surface)",
+                    borderColor: "var(--border)",
+                    boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
                     opacity: loaded ? 1 : 0,
                     transform: loaded ? "translateY(0)" : "translateY(8px)",
                     transitionDelay: `${i * 50}ms`,
@@ -115,11 +116,11 @@ export default function Dashboard({ onNavigate }: Props) {
                   </div>
                   <div
                     className="font-display font-bold text-2xl mb-0.5"
-                    style={{ color: "#e2f0ff" }}
+                    style={{ color: "var(--text-primary)" }}
                   >
                     {value}
                   </div>
-                  <div className="font-display text-[10px] tracking-wide mb-1" style={{ color: "#5a7a9a" }}>
+                  <div className="font-display text-[10px] tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
                     {label}
                   </div>
                   <div className="font-mono-data text-[9px]" style={{ color }}>
@@ -134,22 +135,22 @@ export default function Dashboard({ onNavigate }: Props) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Network panel */}
             <div
-              className="lg:col-span-2 rounded border overflow-hidden"
-              style={{ backgroundColor: "#0c1426", borderColor: "#1a2f52" }}
+              className="lg:col-span-2 rounded-2xl border overflow-hidden"
+              style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}
             >
-              <div className="flex items-center justify-between px-4 py-2 border-b" style={{ borderColor: "#1a2f52" }}>
+              <div className="flex items-center justify-between px-4 py-2 border-b" style={{ borderColor: "var(--border)" }}>
                 <div>
-                  <span className="font-display font-bold text-xs tracking-wider" style={{ color: "#c8d8f0" }}>
+                  <span className="font-display font-bold text-xs tracking-wider" style={{ color: "var(--text-secondary)" }}>
                     INVESTIGATION NETWORK
                   </span>
-                  <span className="font-mono-data text-[9px] ml-3" style={{ color: "#3a5272" }}>
+                  <span className="font-mono-data text-[9px] ml-3" style={{ color: "var(--text-faint)" }}>
                     21 nodes · 26 edges
                   </span>
                 </div>
                 <button
                   onClick={() => onNavigate("network")}
                   className="flex items-center gap-1.5 text-xs font-display font-semibold transition-colors"
-                  style={{ color: "#60a5fa" }}
+                  style={{ color: "var(--accent)" }}
                 >
                   Open Network Analysis <ArrowRight size={12} />
                 </button>
@@ -163,19 +164,24 @@ export default function Dashboard({ onNavigate }: Props) {
 
             {/* Activity Feed */}
             <div
-              className="rounded border flex flex-col"
-              style={{ backgroundColor: "#0c1426", borderColor: "#1a2f52" }}
+              className="rounded-2xl border flex flex-col"
+              style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}
             >
-              <div className="px-4 py-2 border-b flex items-center gap-2" style={{ borderColor: "#1a2f52" }}>
-                <Activity size={12} color="#60a5fa" />
-                <span className="font-display font-bold text-xs tracking-wider" style={{ color: "#c8d8f0" }}>RECENT ACTIVITY</span>
+              <div className="px-4 py-2 border-b flex items-center gap-2" style={{ borderColor: "var(--border)" }}>
+                <Activity size={12} style={{ color: "var(--accent)" }} />
+                <span className="font-display font-bold text-xs tracking-wider" style={{ color: "var(--text-secondary)" }}>RECENT ACTIVITY</span>
               </div>
-              <div className="flex-1 overflow-y-auto divide-y divide-[#1a2f52]">
+              <div className="flex-1 overflow-y-auto divide-y" style={{ borderColor: "var(--border)" }}>
                 {timelineEvents.slice(0, 8).map((event) => {
                   const Icon = ACTIVITY_ICONS[event.type] || Activity;
                   const color = ACTIVITY_COLORS[event.type] || "#60a5fa";
                   return (
-                    <div key={event.id} className="px-4 py-2.5 flex items-start gap-3 hover:bg-[#101c35] transition-colors">
+                    <div
+                      key={event.id}
+                      className="px-4 py-2.5 flex items-start gap-3 transition-colors"
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = "var(--bg-hover)"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = "transparent"; }}
+                    >
                       <div
                         className="flex-shrink-0 mt-0.5 flex items-center justify-center w-5 h-5 rounded-sm"
                         style={{ backgroundColor: `${color}18` }}
@@ -184,10 +190,10 @@ export default function Dashboard({ onNavigate }: Props) {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-baseline gap-2">
-                          <span className="font-mono-data text-[9px] flex-shrink-0" style={{ color: "#3a5272" }}>
+                          <span className="font-mono-data text-[9px] flex-shrink-0" style={{ color: "var(--text-faint)" }}>
                             {event.time}
                           </span>
-                          <span className="text-[10px] truncate" style={{ color: "#c8d8f0" }}>
+                          <span className="text-[10px] truncate" style={{ color: "var(--text-secondary)" }}>
                             {event.description}
                           </span>
                         </div>
@@ -206,16 +212,19 @@ export default function Dashboard({ onNavigate }: Props) {
           </div>
 
           {/* Priority Entities Table */}
-          <div className="rounded border" style={{ backgroundColor: "#0c1426", borderColor: "#1a2f52" }}>
-            <div className="flex items-center justify-between px-4 py-2 border-b" style={{ borderColor: "#1a2f52" }}>
+          <div
+            className="rounded-2xl border"
+            style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}
+          >
+            <div className="flex items-center justify-between px-4 py-2 border-b" style={{ borderColor: "var(--border)" }}>
               <div className="flex items-center gap-2">
                 <AlertTriangle size={12} color="#ef4444" />
-                <span className="font-display font-bold text-xs tracking-wider" style={{ color: "#c8d8f0" }}>PRIORITY ENTITIES</span>
+                <span className="font-display font-bold text-xs tracking-wider" style={{ color: "var(--text-secondary)" }}>PRIORITY ENTITIES</span>
               </div>
               <button
                 onClick={() => onNavigate("entities")}
                 className="text-xs font-display font-semibold"
-                style={{ color: "#60a5fa" }}
+                style={{ color: "var(--accent)" }}
               >
                 View All →
               </button>
@@ -223,12 +232,12 @@ export default function Dashboard({ onNavigate }: Props) {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr style={{ borderBottom: "1px solid #1a2f52" }}>
+                  <tr style={{ borderBottom: `1px solid var(--border)` }}>
                     {["ENTITY", "TYPE", "CONNECTIONS", "PAGERANK", "BETWEENNESS", "PRIORITY", "LAST ACTIVITY"].map((h) => (
                       <th
                         key={h}
                         className="text-left px-4 py-2 font-display font-semibold text-[10px] tracking-widest"
-                        style={{ color: "#3a5272" }}
+                        style={{ color: "var(--text-faint)" }}
                       >
                         {h}
                       </th>
@@ -241,24 +250,24 @@ export default function Dashboard({ onNavigate }: Props) {
                       key={entity.id}
                       className="cursor-pointer transition-colors"
                       onClick={() => setSelectedEntityId(entity.id)}
-                      style={{ borderBottom: "1px solid #0f1c32" }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = "#101c35"; }}
+                      style={{ borderBottom: `1px solid var(--border-subtle)` }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = "var(--bg-hover)"; }}
                       onMouseLeave={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = "transparent"; }}
                     >
                       <td className="px-4 py-2.5">
-                        <span className="font-display font-semibold text-sm" style={{ color: "#c8d8f0" }}>
+                        <span className="font-display font-semibold text-sm" style={{ color: "var(--text-secondary)" }}>
                           {entity.name}
                         </span>
                       </td>
                       <td className="px-4 py-2.5">
                         <span
                           className="font-mono-data text-[10px] px-1.5 py-0.5 rounded-sm capitalize"
-                          style={{ backgroundColor: "#101c35", color: "#60a5fa", border: "1px solid #1a2f52" }}
+                          style={{ backgroundColor: "var(--bg-raised)", color: "var(--accent)", border: "1px solid var(--border)" }}
                         >
                           {entity.type}
                         </span>
                       </td>
-                      <td className="px-4 py-2.5 font-mono-data text-xs" style={{ color: "#c8d8f0" }}>
+                      <td className="px-4 py-2.5 font-mono-data text-xs" style={{ color: "var(--text-secondary)" }}>
                         {entity.connections}
                       </td>
                       <td className="px-4 py-2.5 font-mono-data text-xs" style={{ color: "#3b82f6" }}>
@@ -279,7 +288,7 @@ export default function Dashboard({ onNavigate }: Props) {
                           {entity.priority}
                         </span>
                       </td>
-                      <td className="px-4 py-2.5 font-mono-data text-[10px]" style={{ color: "#5a7a9a" }}>
+                      <td className="px-4 py-2.5 font-mono-data text-[10px]" style={{ color: "var(--text-muted)" }}>
                         {entity.lastSeen}
                       </td>
                     </tr>

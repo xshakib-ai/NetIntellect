@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, FolderOpen, Network, Users, Clock,
   BarChart3, FileText, ScrollText, Settings, Shield,
-  ChevronRight, Wifi, WifiOff,
+  ChevronRight, Wifi,
 } from "lucide-react";
 
 type Page =
@@ -41,27 +41,27 @@ export default function Sidebar({ current, onNavigate, collapsed }: SidebarProps
       className="flex flex-col h-full border-r transition-all duration-300"
       style={{
         width: collapsed ? 56 : 220,
-        backgroundColor: "#070c18",
-        borderColor: "#1a2f52",
+        backgroundColor: "var(--bg-base)",
+        borderColor: "var(--border)",
       }}
     >
       {/* Logo */}
       <div
         className="flex items-center gap-3 px-3 py-4 border-b"
-        style={{ borderColor: "#1a2f52" }}
+        style={{ borderColor: "var(--border)" }}
       >
         <div
           className="flex-shrink-0 flex items-center justify-center rounded"
-          style={{ width: 32, height: 32, backgroundColor: "#1a3a6b" }}
+          style={{ width: 32, height: 32, backgroundColor: "var(--accent-bg)" }}
         >
-          <Shield size={18} color="#60a5fa" />
+          <Shield size={18} style={{ color: "var(--accent)" }} />
         </div>
         {!collapsed && (
           <div>
-            <div className="font-display font-bold text-sm tracking-widest" style={{ color: "#e2f0ff", letterSpacing: "0.15em" }}>
+            <div className="font-display font-bold text-sm tracking-widest" style={{ color: "var(--text-primary)", letterSpacing: "0.15em" }}>
               NETINTELLECT
             </div>
-            <div className="text-[9px] tracking-wider" style={{ color: "#4a6a8a", letterSpacing: "0.08em" }}>
+            <div className="text-[9px] tracking-wider" style={{ color: "var(--text-faint)", letterSpacing: "0.08em" }}>
               INVESTIGATIVE INTELLIGENCE
             </div>
           </div>
@@ -75,7 +75,7 @@ export default function Sidebar({ current, onNavigate, collapsed }: SidebarProps
             {!collapsed && (
               <div
                 className="font-display font-semibold text-[10px] tracking-widest px-2 mb-2"
-                style={{ color: "#3a5272" }}
+                style={{ color: "var(--text-faint)" }}
               >
                 {group.label}
               </div>
@@ -88,18 +88,19 @@ export default function Sidebar({ current, onNavigate, collapsed }: SidebarProps
                     key={id}
                     onClick={() => onNavigate(id)}
                     title={collapsed ? label : undefined}
-                    className="flex items-center gap-3 px-2 py-2 rounded text-left w-full transition-colors duration-150 group"
+                    className="flex items-center gap-3 px-2 py-2 text-left w-full transition-colors duration-150 group"
                     style={{
-                      backgroundColor: active ? "#0f2040" : "transparent",
-                      color: active ? "#60a5fa" : "#5a7a9a",
+                      borderRadius: "9999px",
+                      backgroundColor: active ? "var(--nav-active-bg)" : "transparent",
+                      color: active ? "var(--nav-active-text)" : "var(--text-muted)",
                     }}
                     onMouseEnter={(e) => {
-                      if (!active) e.currentTarget.style.backgroundColor = "#0c1a2e";
-                      if (!active) e.currentTarget.style.color = "#90b8d8";
+                      if (!active) e.currentTarget.style.backgroundColor = "var(--nav-hover-bg)";
+                      if (!active) e.currentTarget.style.color = "var(--nav-hover-text)";
                     }}
                     onMouseLeave={(e) => {
                       if (!active) e.currentTarget.style.backgroundColor = "transparent";
-                      if (!active) e.currentTarget.style.color = "#5a7a9a";
+                      if (!active) e.currentTarget.style.color = "var(--text-muted)";
                     }}
                   >
                     <Icon size={16} className="flex-shrink-0" />
@@ -118,15 +119,15 @@ export default function Sidebar({ current, onNavigate, collapsed }: SidebarProps
       </nav>
 
       {/* Footer */}
-      <div className="border-t p-2 space-y-1" style={{ borderColor: "#1a2f52" }}>
+      <div className="border-t p-2 space-y-1" style={{ borderColor: "var(--border)" }}>
         {/* System Status */}
         <div
           className="flex items-center gap-2 px-2 py-1.5 rounded"
-          style={{ backgroundColor: "#0a1f0a" }}
+          style={{ backgroundColor: "var(--bg-status-ok)" }}
         >
-          <Wifi size={12} color="#22c55e" />
+          <Wifi size={12} style={{ color: "var(--status-ok-text)" }} />
           {!collapsed && (
-            <span className="font-mono-data text-[10px] tracking-wider" style={{ color: "#22c55e" }}>
+            <span className="font-mono-data text-[10px] tracking-wider" style={{ color: "var(--status-ok-text)" }}>
               SYSTEM ONLINE
             </span>
           )}
@@ -134,29 +135,29 @@ export default function Sidebar({ current, onNavigate, collapsed }: SidebarProps
         {/* Profile */}
         <button
           className="flex items-center gap-2 px-2 py-1.5 rounded w-full text-left transition-colors"
-          style={{ color: "#5a7a9a" }}
-          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#0c1a2e"; }}
+          style={{ color: "var(--text-muted)" }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "var(--nav-hover-bg)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
         >
           <div
             className="flex-shrink-0 flex items-center justify-center rounded-sm text-[10px] font-bold"
-            style={{ width: 20, height: 20, backgroundColor: "#1a3a6b", color: "#60a5fa" }}
+            style={{ width: 20, height: 20, backgroundColor: "var(--accent-bg)", color: "var(--accent)" }}
           >
             I
           </div>
           {!collapsed && (
             <div>
-              <div className="font-display text-xs font-semibold" style={{ color: "#90b8d8" }}>Officer 102</div>
-              <div className="font-mono-data text-[9px]" style={{ color: "#3a5272" }}>INVESTIGATOR</div>
+              <div className="font-display text-xs font-semibold" style={{ color: "var(--text-secondary)" }}>Officer 102</div>
+              <div className="font-mono-data text-[9px]" style={{ color: "var(--text-faint)" }}>INVESTIGATOR</div>
             </div>
           )}
         </button>
         {/* Settings */}
         <button
           className="flex items-center gap-2 px-2 py-1.5 rounded w-full transition-colors"
-          style={{ color: "#3a5272" }}
-          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#0c1a2e"; e.currentTarget.style.color = "#5a7a9a"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = "#3a5272"; }}
+          style={{ color: "var(--text-faint)" }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "var(--nav-hover-bg)"; e.currentTarget.style.color = "var(--text-muted)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = "var(--text-faint)"; }}
         >
           <Settings size={14} />
           {!collapsed && <span className="font-display text-xs font-medium">Settings</span>}

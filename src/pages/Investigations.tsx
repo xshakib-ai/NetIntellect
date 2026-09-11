@@ -8,22 +8,22 @@ const PRIORITY_COLORS: Record<string, string> = { HIGH: "#ef4444", MEDIUM: "#f97
 function CaseCard({ c, onSelect }: { c: Case; onSelect: () => void }) {
   return (
     <div
-      className="rounded border cursor-pointer transition-all duration-150 p-4"
-      style={{ backgroundColor: "#0c1426", borderColor: "#1a2f52" }}
+      className="rounded-2xl border cursor-pointer transition-all duration-150 p-4"
+      style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
       onClick={onSelect}
       onMouseEnter={(e) => {
-        (e.currentTarget as HTMLDivElement).style.borderColor = "#2a4f82";
-        (e.currentTarget as HTMLDivElement).style.backgroundColor = "#0f1c35";
+        (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border-focus)";
+        (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)";
       }}
       onMouseLeave={(e) => {
-        (e.currentTarget as HTMLDivElement).style.borderColor = "#1a2f52";
-        (e.currentTarget as HTMLDivElement).style.backgroundColor = "#0c1426";
+        (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)";
+        (e.currentTarget as HTMLDivElement).style.boxShadow = "0 2px 8px rgba(0,0,0,0.04)";
       }}
     >
       <div className="flex items-start justify-between mb-2">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="font-mono-data text-[10px]" style={{ color: "#60a5fa" }}>{c.id}</span>
+            <span className="font-mono-data text-[10px]" style={{ color: "var(--accent)" }}>{c.id}</span>
             <span
               className="font-mono-data text-[9px] px-1.5 py-0.5 rounded-sm border tracking-wider"
               style={{ borderColor: STATUS_COLORS[c.status], color: STATUS_COLORS[c.status], backgroundColor: `${STATUS_COLORS[c.status]}15` }}
@@ -37,30 +37,30 @@ function CaseCard({ c, onSelect }: { c: Case; onSelect: () => void }) {
               {c.priority}
             </span>
           </div>
-          <h3 className="font-display font-bold text-sm" style={{ color: "#c8d8f0" }}>{c.name}</h3>
-          <p className="text-xs mt-0.5 leading-snug" style={{ color: "#5a7a9a" }}>{c.description}</p>
+          <h3 className="font-display font-bold text-sm" style={{ color: "var(--text-primary)" }}>{c.name}</h3>
+          <p className="text-xs mt-0.5 leading-snug" style={{ color: "var(--text-muted)" }}>{c.description}</p>
         </div>
-        <ChevronRight size={16} color="#3a5272" />
+        <ChevronRight size={16} style={{ color: "var(--text-faint)" }} />
       </div>
-      <div className="flex items-center gap-4 mt-3 pt-3 border-t" style={{ borderColor: "#1a2f52" }}>
+      <div className="flex items-center gap-4 mt-3 pt-3 border-t" style={{ borderColor: "var(--border)" }}>
         <div className="flex items-center gap-1.5">
-          <Users size={11} color="#5a7a9a" />
-          <span className="font-mono-data text-[10px]" style={{ color: "#c8d8f0" }}>{c.entities}</span>
-          <span className="text-[9px]" style={{ color: "#3a5272" }}>entities</span>
+          <Users size={11} style={{ color: "var(--text-faint)" }} />
+          <span className="font-mono-data text-[10px]" style={{ color: "var(--text-secondary)" }}>{c.entities}</span>
+          <span className="text-[9px]" style={{ color: "var(--text-faint)" }}>entities</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <Network size={11} color="#5a7a9a" />
-          <span className="font-mono-data text-[10px]" style={{ color: "#c8d8f0" }}>{c.relationships}</span>
-          <span className="text-[9px]" style={{ color: "#3a5272" }}>links</span>
+          <Network size={11} style={{ color: "var(--text-faint)" }} />
+          <span className="font-mono-data text-[10px]" style={{ color: "var(--text-secondary)" }}>{c.relationships}</span>
+          <span className="text-[9px]" style={{ color: "var(--text-faint)" }}>links</span>
         </div>
         <div className="flex items-center gap-1.5">
           <AlertTriangle size={11} color="#ef4444" />
           <span className="font-mono-data text-[10px]" style={{ color: "#ef4444" }}>{c.highPriority}</span>
-          <span className="text-[9px]" style={{ color: "#3a5272" }}>high-pri</span>
+          <span className="text-[9px]" style={{ color: "var(--text-faint)" }}>high-pri</span>
         </div>
         <div className="ml-auto flex items-center gap-1.5">
-          <Clock size={10} color="#3a5272" />
-          <span className="font-mono-data text-[9px]" style={{ color: "#3a5272" }}>{c.lastActivity}</span>
+          <Clock size={10} style={{ color: "var(--text-faint)" }} />
+          <span className="font-mono-data text-[9px]" style={{ color: "var(--text-faint)" }}>{c.lastActivity}</span>
         </div>
       </div>
       <div className="flex items-center gap-1 mt-2">
@@ -68,7 +68,7 @@ function CaseCard({ c, onSelect }: { c: Case; onSelect: () => void }) {
           <span
             key={tag}
             className="font-mono-data text-[8px] px-1.5 py-0.5 rounded"
-            style={{ backgroundColor: "#101c35", color: "#5a7a9a", border: "1px solid #1a2f52" }}
+            style={{ backgroundColor: "var(--bg-raised)", color: "var(--text-muted)", border: "1px solid var(--border)" }}
           >
             {tag}
           </span>
@@ -98,24 +98,28 @@ export default function Investigations({ onOpenCase }: Props) {
       {/* Header */}
       <div
         className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0"
-        style={{ borderColor: "#1a2f52" }}
+        style={{ borderColor: "var(--border)" }}
       >
         <div>
-          <h1 className="font-display font-bold text-xl tracking-wider" style={{ color: "#e2f0ff" }}>INVESTIGATIONS</h1>
-          <span className="font-mono-data text-xs" style={{ color: "#3a5272" }}>
+          <h1 className="font-display font-bold text-xl tracking-wider" style={{ color: "var(--text-primary)" }}>INVESTIGATIONS</h1>
+          <span className="font-mono-data text-xs" style={{ color: "var(--text-faint)" }}>
             {cases.filter((c) => c.status === "ACTIVE").length} active cases
           </span>
         </div>
         <div className="flex items-center gap-2">
           <button
-            className="flex items-center gap-2 px-3 py-1.5 rounded border text-xs font-display font-semibold tracking-wide transition-colors"
-            style={{ borderColor: "#1a2f52", color: "#90b8d8", backgroundColor: "#0c1426" }}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-display font-semibold tracking-wide transition-colors"
+            style={{ borderColor: "var(--border)", color: "var(--text-secondary)", backgroundColor: "var(--bg-surface)" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-focus)"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"; }}
           >
             <Download size={12} />Import Case
           </button>
           <button
-            className="flex items-center gap-2 px-3 py-1.5 rounded text-xs font-display font-bold tracking-wide"
-            style={{ backgroundColor: "#1d3a7a", color: "#c8e0ff" }}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-display font-bold tracking-wide transition-colors"
+            style={{ backgroundColor: "var(--btn-primary-bg)", color: "var(--btn-primary-fg)" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--accent-hover)"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--btn-primary-bg)"; }}
           >
             <Plus size={12} />New Investigation
           </button>
@@ -124,20 +128,20 @@ export default function Investigations({ onOpenCase }: Props) {
 
       {/* Filters */}
       <div
-        className="flex items-center gap-3 px-6 py-3 border-b"
-        style={{ backgroundColor: "#070c18", borderColor: "#1a2f52" }}
+        className="flex items-center gap-3 px-6 py-3 border-b flex-shrink-0"
+        style={{ backgroundColor: "var(--bg-base)", borderColor: "var(--border)" }}
       >
         <div
           className="flex items-center gap-2 px-3 py-1.5 rounded border flex-1 max-w-xs"
-          style={{ backgroundColor: "#0c1426", borderColor: "#1a2f52" }}
+          style={{ backgroundColor: "var(--bg-input)", borderColor: "var(--border)" }}
         >
-          <Search size={12} color="#5a7a9a" />
+          <Search size={12} style={{ color: "var(--text-faint)" }} />
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by Case ID or name..."
             className="bg-transparent text-xs outline-none flex-1"
-            style={{ color: "#c8d8f0" }}
+            style={{ color: "var(--text-secondary)" }}
           />
         </div>
         {["ALL", "ACTIVE", "REVIEW", "CLOSED"].map((status) => (
@@ -146,15 +150,15 @@ export default function Investigations({ onOpenCase }: Props) {
             onClick={() => setStatusFilter(status)}
             className="font-display text-[10px] font-semibold tracking-wide px-2.5 py-1.5 rounded border transition-colors"
             style={{
-              borderColor: statusFilter === status ? STATUS_COLORS[status] || "#3b82f6" : "#1a2f52",
-              color: statusFilter === status ? STATUS_COLORS[status] || "#60a5fa" : "#3a5272",
-              backgroundColor: statusFilter === status ? `${STATUS_COLORS[status] || "#3b82f6"}15` : "#0c1426",
+              borderColor: statusFilter === status ? STATUS_COLORS[status] || "var(--accent)" : "var(--border)",
+              color: statusFilter === status ? STATUS_COLORS[status] || "var(--accent)" : "var(--text-faint)",
+              backgroundColor: statusFilter === status ? `${STATUS_COLORS[status] || "var(--accent)"}15` : "var(--bg-surface)",
             }}
           >
             {status}
           </button>
         ))}
-        <span className="font-mono-data text-[10px] ml-auto" style={{ color: "#3a5272" }}>
+        <span className="font-mono-data text-[10px] ml-auto" style={{ color: "var(--text-faint)" }}>
           {filtered.length} case{filtered.length !== 1 ? "s" : ""}
         </span>
       </div>

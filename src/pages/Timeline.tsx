@@ -32,18 +32,18 @@ export default function Timeline() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "#1a2f52" }}>
+      <div className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0" style={{ borderColor: "var(--border)" }}>
         <div>
-          <h1 className="font-display font-bold text-xl tracking-wider" style={{ color: "#e2f0ff" }}>TIMELINE</h1>
-          <span className="font-mono-data text-xs" style={{ color: "#3a5272" }}>CASE-2026-001 · Chronological investigation record</span>
+          <h1 className="font-display font-bold text-xl tracking-wider" style={{ color: "var(--text-primary)" }}>TIMELINE</h1>
+          <span className="font-mono-data text-xs" style={{ color: "var(--text-faint)" }}>CASE-2026-001 · Chronological investigation record</span>
         </div>
       </div>
 
       {/* Filter */}
-      <div className="flex items-center gap-2 px-6 py-3 border-b" style={{ borderColor: "#1a2f52" }}>
+      <div className="flex items-center gap-2 px-6 py-3 border-b flex-shrink-0" style={{ borderColor: "var(--border)" }}>
         {FILTER_TYPES.map((f) => {
           const typeKey = TYPE_MAP[f];
-          const color = typeKey ? TYPE_CONFIG[typeKey]?.color : "#60a5fa";
+          const color = typeKey ? TYPE_CONFIG[typeKey]?.color : "var(--accent)";
           const active = filter === f;
           return (
             <button
@@ -51,9 +51,9 @@ export default function Timeline() {
               onClick={() => setFilter(f)}
               className="font-display text-[10px] font-semibold tracking-wide px-2.5 py-1 rounded border transition-colors"
               style={{
-                borderColor: active ? color : "#1a2f52",
-                color: active ? color : "#3a5272",
-                backgroundColor: active ? `${color}15` : "#0c1426",
+                borderColor: active ? color : "var(--border)",
+                color: active ? color : "var(--text-faint)",
+                backgroundColor: active ? (typeKey ? `${color}15` : "var(--bg-raised)") : "var(--bg-surface)",
               }}
             >
               {f}
@@ -69,15 +69,15 @@ export default function Timeline() {
             <div className="flex items-center gap-3 mb-4">
               <div
                 className="font-display font-bold text-xs tracking-widest px-3 py-1 rounded"
-                style={{ backgroundColor: "#101c35", color: "#60a5fa", border: "1px solid #1a2f52" }}
+                style={{ backgroundColor: "var(--bg-raised)", color: "var(--accent)", border: "1px solid var(--border)" }}
               >
                 {date}
               </div>
-              <div className="flex-1 h-px" style={{ backgroundColor: "#1a2f52" }} />
+              <div className="flex-1 h-px" style={{ backgroundColor: "var(--border)" }} />
             </div>
 
             {/* Events */}
-            <div className="space-y-3 pl-4 border-l-2" style={{ borderColor: "#1a2f52" }}>
+            <div className="space-y-3 pl-4 border-l-2" style={{ borderColor: "var(--border)" }}>
               {events.map((event) => {
                 const cfg = TYPE_CONFIG[event.type] || TYPE_CONFIG.evidence;
                 const { icon: Icon, color } = cfg;
@@ -86,16 +86,16 @@ export default function Timeline() {
                     {/* Connector dot */}
                     <div
                       className="absolute -left-[21px] top-2 w-4 h-4 rounded-full flex items-center justify-center border-2"
-                      style={{ backgroundColor: "#070c18", borderColor: color }}
+                      style={{ backgroundColor: "var(--bg-base)", borderColor: color }}
                     >
                       <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
                     </div>
 
                     <div
-                      className="flex-1 rounded border p-3 ml-2 transition-colors"
-                      style={{ backgroundColor: "#0c1426", borderColor: "#1a2f52" }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "#2a4f82"; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "#1a2f52"; }}
+                      className="flex-1 rounded-2xl border p-3 ml-2 transition-colors"
+                      style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border-focus)"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)"; }}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-2">
@@ -103,26 +103,26 @@ export default function Timeline() {
                             <Icon size={11} color={color} />
                           </div>
                           <div>
-                            <div className="font-display font-semibold text-sm" style={{ color: "#c8d8f0" }}>
+                            <div className="font-display font-semibold text-sm" style={{ color: "var(--text-secondary)" }}>
                               {event.description}
                             </div>
                             <div className="flex items-center gap-2 mt-0.5">
                               {event.entities.map((ent) => (
-                                <span key={ent} className="font-mono-data text-[9px]" style={{ color: "#5a7a9a" }}>{ent}</span>
+                                <span key={ent} className="font-mono-data text-[9px]" style={{ color: "var(--text-faint)" }}>{ent}</span>
                               ))}
                             </div>
                           </div>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <div className="font-mono-data text-[10px]" style={{ color: "#3a5272" }}>{event.time}</div>
+                          <div className="font-mono-data text-[10px]" style={{ color: "var(--text-faint)" }}>{event.time}</div>
                           {event.verified && (
-                            <div className="font-mono-data text-[8px] mt-0.5" style={{ color: "#22c55e" }}>✓ VERIFIED</div>
+                            <div className="font-mono-data text-[8px] mt-0.5" style={{ color: "var(--status-ok-text)" }}>✓ VERIFIED</div>
                           )}
                         </div>
                       </div>
 
                       {(event.amount || event.duration) && (
-                        <div className="flex items-center gap-3 mt-2 pt-2 border-t" style={{ borderColor: "#1a2f52" }}>
+                        <div className="flex items-center gap-3 mt-2 pt-2 border-t" style={{ borderColor: "var(--border)" }}>
                           {event.amount && (
                             <span className="font-mono-data text-xs font-bold" style={{ color: "#10b981" }}>{event.amount}</span>
                           )}

@@ -31,28 +31,28 @@ export default function Entities() {
     <div className="flex h-full overflow-hidden">
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "#1a2f52" }}>
+        <div className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0" style={{ borderColor: "var(--border)" }}>
           <div>
-            <h1 className="font-display font-bold text-xl tracking-wider" style={{ color: "#e2f0ff" }}>ENTITIES</h1>
-            <span className="font-mono-data text-xs" style={{ color: "#3a5272" }}>Intelligence database · {entities.length} records</span>
+            <h1 className="font-display font-bold text-xl tracking-wider" style={{ color: "var(--text-primary)" }}>ENTITIES</h1>
+            <span className="font-mono-data text-xs" style={{ color: "var(--text-faint)" }}>Intelligence database · {entities.length} records</span>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-3 px-6 py-3 border-b" style={{ borderColor: "#1a2f52" }}>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded border" style={{ backgroundColor: "#0c1426", borderColor: "#1a2f52" }}>
-            <Search size={12} color="#5a7a9a" />
+        <div className="flex items-center gap-3 px-6 py-3 border-b flex-shrink-0" style={{ borderColor: "var(--border)" }}>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded border" style={{ backgroundColor: "var(--bg-input)", borderColor: "var(--border)" }}>
+            <Search size={12} style={{ color: "var(--text-faint)" }} />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search people, phones, UPI IDs, FIRs..."
               className="bg-transparent text-xs outline-none w-64"
-              style={{ color: "#c8d8f0" }}
+              style={{ color: "var(--text-secondary)" }}
             />
           </div>
           <div className="flex items-center gap-1.5 flex-wrap">
             {FILTER_TYPES.map((t) => {
-              const color = t === "all" ? "#60a5fa" : TYPE_COLOR[t as EntityType];
+              const color = t === "all" ? "var(--accent)" : TYPE_COLOR[t as EntityType];
               const active = typeFilter === t;
               return (
                 <button
@@ -60,9 +60,9 @@ export default function Entities() {
                   onClick={() => setTypeFilter(t)}
                   className="font-display text-[10px] font-semibold tracking-wide px-2 py-1 rounded border capitalize transition-colors"
                   style={{
-                    borderColor: active ? color : "#1a2f52",
-                    color: active ? color : "#3a5272",
-                    backgroundColor: active ? `${color}15` : "#0c1426",
+                    borderColor: active ? color : "var(--border)",
+                    color: active ? color : "var(--text-faint)",
+                    backgroundColor: active ? (t === "all" ? "var(--bg-raised)" : `${color}15`) : "var(--bg-surface)",
                   }}
                 >
                   {t === "all" ? "All" : t}
@@ -75,10 +75,10 @@ export default function Entities() {
         {/* Table */}
         <div className="flex-1 overflow-y-auto">
           <table className="w-full">
-            <thead className="sticky top-0" style={{ backgroundColor: "#070c18" }}>
+            <thead className="sticky top-0 z-10" style={{ backgroundColor: "var(--bg-base)" }}>
               <tr>
                 {["ENTITY", "TYPE", "CONNECTIONS", "CASES", "PRIORITY", "LAST SEEN"].map((h) => (
-                  <th key={h} className="text-left px-5 py-2.5 font-display font-semibold text-[10px] tracking-widest border-b" style={{ color: "#3a5272", borderColor: "#1a2f52" }}>
+                  <th key={h} className="text-left px-5 py-2.5 font-display font-semibold text-[10px] tracking-widest border-b" style={{ color: "var(--text-faint)", borderColor: "var(--border)" }}>
                     {h}
                   </th>
                 ))}
@@ -93,9 +93,9 @@ export default function Entities() {
                   <tr
                     key={entity.id}
                     className="cursor-pointer transition-colors"
-                    style={{ borderBottom: "1px solid #0f1c32" }}
+                    style={{ borderBottom: "1px solid var(--border-subtle)" }}
                     onClick={() => setSelectedId(entity.id === selectedId ? null : entity.id)}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = "#0c1426"; }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = "var(--bg-hover)"; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = "transparent"; }}
                   >
                     <td className="px-5 py-2.5">
@@ -104,24 +104,24 @@ export default function Entities() {
                           <Icon size={11} color={color} />
                         </div>
                         <div>
-                          <div className="font-display font-semibold text-sm" style={{ color: "#c8d8f0" }}>{entity.name}</div>
-                          <div className="font-mono-data text-[9px]" style={{ color: "#3a5272" }}>{entity.id}</div>
+                          <div className="font-display font-semibold text-sm" style={{ color: "var(--text-secondary)" }}>{entity.name}</div>
+                          <div className="font-mono-data text-[9px]" style={{ color: "var(--text-faint)" }}>{entity.id}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-5 py-2.5">
-                      <span className="font-mono-data text-[10px] px-1.5 py-0.5 rounded-sm capitalize" style={{ backgroundColor: "#101c35", color, border: `1px solid ${color}30` }}>
+                      <span className="font-mono-data text-[10px] px-1.5 py-0.5 rounded-sm capitalize" style={{ backgroundColor: "var(--bg-raised)", color, border: `1px solid ${color}30` }}>
                         {entity.type}
                       </span>
                     </td>
-                    <td className="px-5 py-2.5 font-mono-data text-xs" style={{ color: "#c8d8f0" }}>{entity.connections}</td>
-                    <td className="px-5 py-2.5 font-mono-data text-xs" style={{ color: "#60a5fa" }}>{entity.cases.length}</td>
+                    <td className="px-5 py-2.5 font-mono-data text-xs" style={{ color: "var(--text-secondary)" }}>{entity.connections}</td>
+                    <td className="px-5 py-2.5 font-mono-data text-xs" style={{ color: "var(--accent)" }}>{entity.cases.length}</td>
                     <td className="px-5 py-2.5">
                       <span className="font-mono-data text-[9px] px-1.5 py-0.5 rounded-sm" style={{ color: priorityColors[entity.priority], backgroundColor: `${priorityColors[entity.priority]}15`, border: `1px solid ${priorityColors[entity.priority]}30` }}>
                         {entity.priority}
                       </span>
                     </td>
-                    <td className="px-5 py-2.5 font-mono-data text-[10px]" style={{ color: "#5a7a9a" }}>{entity.lastSeen}</td>
+                    <td className="px-5 py-2.5 font-mono-data text-[10px]" style={{ color: "var(--text-muted)" }}>{entity.lastSeen}</td>
                   </tr>
                 );
               })}

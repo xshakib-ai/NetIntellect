@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Search, Bell, Calendar, Menu, X, AlertTriangle, DollarSign, CheckCircle, Info } from "lucide-react";
 import { notifications } from "../lib/mockData";
 import { search } from "../lib/api";
+import ThemeToggle from "./ThemeToggle";
 
 interface HeaderProps {
   sidebarCollapsed: boolean;
@@ -55,15 +56,15 @@ export default function Header({ sidebarCollapsed, onToggleSidebar, demoMode, on
     <>
       <header
         className="flex items-center gap-4 px-4 h-12 border-b flex-shrink-0 relative z-30"
-        style={{ backgroundColor: "#070c18", borderColor: "#1a2f52" }}
+        style={{ backgroundColor: "var(--bg-base)", borderColor: "var(--border)" }}
       >
         {/* Sidebar toggle */}
         <button
           onClick={onToggleSidebar}
           className="flex-shrink-0 transition-colors"
-          style={{ color: "#3a5272" }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "#60a5fa"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "#3a5272"; }}
+          style={{ color: "var(--text-faint)" }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--accent)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-faint)"; }}
         >
           {sidebarCollapsed ? <Menu size={16} /> : <Menu size={16} />}
         </button>
@@ -71,10 +72,10 @@ export default function Header({ sidebarCollapsed, onToggleSidebar, demoMode, on
         {/* Case badge */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <div>
-            <div className="font-mono-data text-[11px] font-semibold" style={{ color: "#60a5fa" }}>CASE-2026-001</div>
-            <div className="font-display text-[10px] tracking-wider" style={{ color: "#3a5272" }}>CYBERCRIME INVESTIGATION</div>
+            <div className="font-mono-data text-[11px] font-semibold" style={{ color: "var(--accent)" }}>CASE-2026-001</div>
+            <div className="font-display text-[10px] tracking-wider" style={{ color: "var(--text-faint)" }}>CYBERCRIME INVESTIGATION</div>
           </div>
-          <div className="h-6 w-px" style={{ backgroundColor: "#1a2f52" }} />
+          <div className="h-6 w-px" style={{ backgroundColor: "var(--border)" }} />
           <div className="flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 rounded-full animate-pulse-dot" style={{ backgroundColor: "#22c55e" }} />
             <span className="font-display text-xs font-semibold tracking-wider" style={{ color: "#22c55e" }}>ACTIVE</span>
@@ -89,14 +90,14 @@ export default function Header({ sidebarCollapsed, onToggleSidebar, demoMode, on
           onClick={onToggleDemo}
           className="flex items-center gap-2 px-3 py-1 rounded border text-xs font-mono-data tracking-wider transition-all"
           style={{
-            borderColor: demoMode ? "#f97316" : "#1a2f52",
-            color: demoMode ? "#f97316" : "#3a5272",
+            borderColor: demoMode ? "#f97316" : "var(--border)",
+            color: demoMode ? "#f97316" : "var(--text-faint)",
             backgroundColor: demoMode ? "rgba(249,115,22,0.08)" : "transparent",
           }}
         >
           <div
             className="w-1.5 h-1.5 rounded-full"
-            style={{ backgroundColor: demoMode ? "#f97316" : "#3a5272" }}
+            style={{ backgroundColor: demoMode ? "#f97316" : "var(--text-faint)" }}
           />
           DEMO MODE
         </button>
@@ -105,28 +106,31 @@ export default function Header({ sidebarCollapsed, onToggleSidebar, demoMode, on
         <button
           onClick={() => { setShowSearch(true); setTimeout(() => searchRef.current?.focus(), 50); }}
           className="flex items-center gap-2 px-3 py-1.5 rounded border text-xs transition-colors"
-          style={{ borderColor: "#1a2f52", color: "#3a5272", backgroundColor: "#0c1426" }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#2a4f82"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#1a2f52"; }}
+          style={{ borderColor: "var(--border)", color: "var(--text-faint)", backgroundColor: "var(--bg-input)" }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-focus)"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"; }}
         >
           <Search size={12} />
-          <span className="font-mono-data" style={{ color: "#3a5272" }}>Search...</span>
+          <span className="font-mono-data" style={{ color: "var(--text-faint)" }}>Search...</span>
           <span
             className="font-mono-data text-[10px] px-1 rounded border"
-            style={{ borderColor: "#1a2f52", color: "#2a4060" }}
+            style={{ borderColor: "var(--border)", color: "var(--text-xfaint)" }}
           >
             ⌘K
           </span>
         </button>
+
+        {/* Theme Toggle */}
+        <ThemeToggle />
 
         {/* Notifications */}
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
             className="relative flex items-center justify-center w-8 h-8 rounded border transition-colors"
-            style={{ borderColor: "#1a2f52", color: "#3a5272", backgroundColor: "#0c1426" }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#2a4f82"; (e.currentTarget as HTMLButtonElement).style.color = "#60a5fa"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#1a2f52"; (e.currentTarget as HTMLButtonElement).style.color = "#3a5272"; }}
+            style={{ borderColor: "var(--border)", color: "var(--text-faint)", backgroundColor: "var(--bg-input)" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-focus)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--accent)"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--text-faint)"; }}
           >
             <Bell size={14} />
             <span
@@ -140,21 +144,27 @@ export default function Header({ sidebarCollapsed, onToggleSidebar, demoMode, on
           {showNotifications && (
             <div
               className="absolute right-0 top-9 w-80 rounded border shadow-xl z-50"
-              style={{ backgroundColor: "#0c1426", borderColor: "#1a2f52" }}
+              style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}
             >
-              <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor: "#1a2f52" }}>
-                <span className="font-display font-semibold text-xs tracking-wider" style={{ color: "#c8d8f0" }}>NOTIFICATIONS</span>
-                <button onClick={() => setShowNotifications(false)}><X size={12} color="#3a5272" /></button>
+              <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor: "var(--border)" }}>
+                <span className="font-display font-semibold text-xs tracking-wider" style={{ color: "var(--text-secondary)" }}>NOTIFICATIONS</span>
+                <button onClick={() => setShowNotifications(false)}><X size={12} style={{ color: "var(--text-faint)" }} /></button>
               </div>
-              <div className="divide-y divide-[#1a2f52]">
+              <div className="divide-y" style={{ borderColor: "var(--border)" }}>
                 {notifications.map((n) => (
-                  <div key={n.id} className="px-3 py-2.5 hover:bg-[#101c35] transition-colors cursor-pointer">
+                  <div
+                    key={n.id}
+                    className="px-3 py-2.5 transition-colors cursor-pointer"
+                    style={{ borderColor: "var(--border)" }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = "var(--bg-hover)"; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = "transparent"; }}
+                  >
                     <div className="flex items-center gap-2 mb-1">
                       {notifIcon(n.type)}
-                      <span className="font-display font-semibold text-xs" style={{ color: "#c8d8f0" }}>{n.title}</span>
+                      <span className="font-display font-semibold text-xs" style={{ color: "var(--text-secondary)" }}>{n.title}</span>
                     </div>
-                    <p className="text-xs leading-snug" style={{ color: "#5a7a9a" }}>{n.body}</p>
-                    <p className="font-mono-data text-[9px] mt-1" style={{ color: "#2a4060" }}>{n.time}</p>
+                    <p className="text-xs leading-snug" style={{ color: "var(--text-muted)" }}>{n.body}</p>
+                    <p className="font-mono-data text-[9px] mt-1" style={{ color: "var(--text-xfaint)" }}>{n.time}</p>
                   </div>
                 ))}
               </div>
@@ -165,10 +175,10 @@ export default function Header({ sidebarCollapsed, onToggleSidebar, demoMode, on
         {/* Security badge */}
         <div
           className="hidden md:flex items-center gap-1.5 px-2 py-1 rounded border"
-          style={{ borderColor: "#1a4a1a", backgroundColor: "#0a1f0a" }}
+          style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-status-ok)" }}
         >
-          <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#22c55e" }} />
-          <span className="font-mono-data text-[9px] tracking-wider" style={{ color: "#22c55e" }}>SECURE ENV</span>
+          <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "var(--status-ok-text)" }} />
+          <span className="font-mono-data text-[9px] tracking-wider" style={{ color: "var(--status-ok-text)" }}>SECURE ENV</span>
         </div>
       </header>
 
@@ -176,22 +186,22 @@ export default function Header({ sidebarCollapsed, onToggleSidebar, demoMode, on
       {showSearch && (
         <div
           className="fixed inset-0 z-50 flex items-start justify-center pt-24"
-          style={{ backgroundColor: "rgba(7,12,24,0.85)" }}
+          style={{ backgroundColor: "var(--bg-overlay)" }}
           onClick={(e) => { if (e.target === e.currentTarget) { setShowSearch(false); setSearchQuery(""); setSearchResults(null); } }}
         >
-          <div className="w-full max-w-xl rounded border shadow-2xl overflow-hidden" style={{ backgroundColor: "#0c1426", borderColor: "#2a4f82" }}>
-            <div className="flex items-center gap-3 px-4 py-3 border-b" style={{ borderColor: "#1a2f52" }}>
-              <Search size={16} color="#60a5fa" />
+          <div className="w-full max-w-xl rounded border shadow-2xl overflow-hidden" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border-focus)" }}>
+            <div className="flex items-center gap-3 px-4 py-3 border-b" style={{ borderColor: "var(--border)" }}>
+              <Search size={16} style={{ color: "var(--accent)" }} />
               <input
                 ref={searchRef}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search entities, cases, phones, FIRs..."
                 className="flex-1 bg-transparent outline-none text-sm"
-                style={{ color: "#c8d8f0" }}
+                style={{ color: "var(--text-secondary)" }}
               />
               <button onClick={() => { setShowSearch(false); setSearchQuery(""); setSearchResults(null); }}>
-                <X size={14} color="#3a5272" />
+                <X size={14} style={{ color: "var(--text-faint)" }} />
               </button>
             </div>
             {searchResults && (
@@ -200,13 +210,18 @@ export default function Header({ sidebarCollapsed, onToggleSidebar, demoMode, on
                   if (!items || (items as unknown[]).length === 0) return null;
                   return (
                     <div key={group} className="mb-3">
-                      <div className="font-display font-semibold text-[10px] tracking-widest px-2 py-1" style={{ color: "#3a5272" }}>
+                      <div className="font-display font-semibold text-[10px] tracking-widest px-2 py-1" style={{ color: "var(--text-faint)" }}>
                         {group.toUpperCase()}
                       </div>
                       {(items as { id?: string; name?: string; filename?: string }[]).slice(0, 3).map((item) => (
-                        <div key={item.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[#101c35] cursor-pointer">
-                          <span className="text-sm" style={{ color: "#c8d8f0" }}>{item.name || item.filename}</span>
-                          {item.id && <span className="font-mono-data text-[10px]" style={{ color: "#3a5272" }}>{item.id}</span>}
+                        <div
+                          key={item.id}
+                          className="flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer transition-colors"
+                          onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = "var(--bg-hover)"; }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = "transparent"; }}
+                        >
+                          <span className="text-sm" style={{ color: "var(--text-secondary)" }}>{item.name || item.filename}</span>
+                          {item.id && <span className="font-mono-data text-[10px]" style={{ color: "var(--text-faint)" }}>{item.id}</span>}
                         </div>
                       ))}
                     </div>
@@ -216,7 +231,7 @@ export default function Header({ sidebarCollapsed, onToggleSidebar, demoMode, on
             )}
             {!searchQuery && (
               <div className="px-4 py-3">
-                <p className="text-xs" style={{ color: "#3a5272" }}>Try: "Rajesh Kumar", "+91 ••••••4821", "FIR-2026-0142", "CASE-2026-001"</p>
+                <p className="text-xs" style={{ color: "var(--text-faint)" }}>Try: "Rajesh Kumar", "+91 ••••••4821", "FIR-2026-0142", "CASE-2026-001"</p>
               </div>
             )}
           </div>
