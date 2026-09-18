@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { ZoomIn, ZoomOut, Maximize2, RotateCcw } from "lucide-react";
+import * as d3 from "d3-force";
 import { graphNodes, graphEdges, entities, type GraphNode, type GraphEdge } from "../lib/mockData";
 
 const TYPE_COLOR: Record<string, string> = {
@@ -31,16 +32,16 @@ interface Props {
   edges?: GraphEdge[];
 }
 
-export default function NetworkGraph({ 
-  selectedEntityId, 
-  onSelectEntity, 
+export default function NetworkGraph({
+  selectedEntityId,
+  onSelectEntity,
   height = 500,
   nodes: propNodes,
-  edges: propEdges 
+  edges: propEdges
 }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [transform, setTransform] = useState<Transform>({ x: 0, y: 0, scale: 1 });
-  
+
   const currentNodes = propNodes && propNodes.length > 0 ? propNodes : graphNodes;
   const currentEdges = propEdges && propEdges.length > 0 ? propEdges : graphEdges;
 
@@ -48,7 +49,7 @@ export default function NetworkGraph({
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [highlightedPath, setHighlightedPath] = useState<Set<string>>(new Set());
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
-  
+
   const dragRef = useRef<{
     type: "pan" | "node";
     nodeId?: string;
@@ -59,10 +60,29 @@ export default function NetworkGraph({
   } | null>(null);
 
   useEffect(() => {
-    if (propNodes && propNodes.length > 0) {
-      setNodes(propNodes);
-    }
-  }, [propNodes]);
+    const simNodes = currentNodes.map(n => ({ ...n }));
+    const nodeIds = new Set(simNodes.map(n => n.id));
+
+    // FATAL FIX: D3 forceLink crashes completely if an edge target/source doesn't exist in nodeIds.
+    // In subset graphs (like Evidence details), edges might link outside the subset. We must drop them.
+    const simEdges = currentEdges
+      .filter(e => nodeIds.has(e.source) && nodeIds.has(e.target))
+      .map(e => ({ ...e }));
+
+    const width = svgRef.current?.parentElement?.clientWidth || 800;
+
+    // Run an instant headless 300 tick pass to generate perfect layouts without lag
+    const simulation = d3.forceSimulation(simNodes as any)
+      .force("link", d3.forceLink(simEdges as any).id((d: any) => d.id).distance((l: any) => 50 + (1 / (l.frequency || 1)) * 30))
+      .force("charge", d3.forceManyBody().strength(-250))
+      .force("collision", d3.forceCollide().radius(NODE_RADIUS * 1.5))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .stop();
+
+    for (let i = 0; i < 300; ++i) simulation.tick();
+
+    setNodes(simNodes as GraphNode[]);
+  }, [propNodes, propEdges, height]);
 
   useEffect(() => {
     if (selectedEntityId) {

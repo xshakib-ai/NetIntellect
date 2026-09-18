@@ -1,5 +1,6 @@
-import { X, User, Phone, MapPin, Hash, CreditCard, Monitor, Building2, FileText } from "lucide-react";
-import { entities, type Entity } from "../lib/mockData";
+import { X, User, Phone, MapPin, Hash, CreditCard, Monitor, Building2, FileText, Share2 } from "lucide-react";
+import { useGlobalState } from "../lib/store";
+import { Fragment } from "react";
 
 const TYPE_COLOR: Record<string, string> = {
   person: "#ef4444", phone: "#3b82f6", upi: "#10b981", bank: "#10b981",
@@ -13,12 +14,13 @@ const TYPE_ICON: Record<string, React.ElementType> = {
 
 function PriorityBadge({ priority }: { priority: "HIGH" | "MEDIUM" | "LOW" }) {
   const colors: Record<string, string> = { HIGH: "#ef4444", MEDIUM: "#f97316", LOW: "#22c55e" };
+  const fallbackPriority = priority || "MEDIUM";
   return (
     <span
       className="font-mono-data text-[9px] px-1.5 py-0.5 rounded-sm border tracking-wider"
-      style={{ borderColor: colors[priority], color: colors[priority], backgroundColor: `${colors[priority]}15` }}
+      style={{ borderColor: colors[fallbackPriority], color: colors[fallbackPriority], backgroundColor: `${colors[fallbackPriority]}15` }}
     >
-      {priority} PRIORITY
+      {fallbackPriority} PRIORITY
     </span>
   );
 }
@@ -43,11 +45,26 @@ interface Props {
 }
 
 export default function EntityInspector({ entityId, onClose }: Props) {
+  const { entities, edges, activeCaseId } = useGlobalState();
   const entity = entityId ? entities.find((e) => e.id === entityId) : null;
+
   if (!entity) return null;
 
   const color = TYPE_COLOR[entity.type] || "#64748b";
   const Icon = TYPE_ICON[entity.type] || User;
+
+  // Dynamically group edge relationships
+  const connectedEdges = edges.filter(e => e.source === entity.id || e.target === entity.id);
+  const relationsGrouped: Record<string, string[]> = {};
+
+  connectedEdges.forEach(e => {
+    const isSrc = e.source === entity.id;
+    const targetId = isSrc ? e.target : e.source;
+    const prefix = isSrc ? e.type : `<- ${e.type}`;
+
+    if (!relationsGrouped[e.type]) relationsGrouped[e.type] = [];
+    relationsGrouped[e.type].push(targetId);
+  });
 
   return (
     <div
@@ -83,57 +100,59 @@ export default function EntityInspector({ entityId, onClose }: Props) {
         <span className="font-mono-data text-[9px]" style={{ color: "var(--text-xfaint)" }}>{entity.id}</span>
       </div>
 
-      {/* Investigative Priority Score */}
-      <div className="px-3 py-3 border-b" style={{ borderColor: "var(--border)" }}>
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="font-display font-semibold text-[10px] tracking-wider" style={{ color: "var(--text-muted)" }}>
-            INVESTIGATIVE PRIORITY
-          </span>
-          <span className="font-mono-data text-xs font-bold" style={{ color: "#f97316" }}>
-            {entity.investigativePriority} / 100
-          </span>
-        </div>
-        <div className="h-1.5 rounded-full" style={{ backgroundColor: "var(--border)" }}>
-          <div
-            className="h-full rounded-full"
-            style={{
-              width: `${entity.investigativePriority}%`,
-              background: "linear-gradient(90deg, #1d4ed8, #f97316)",
-            }}
-          />
-        </div>
-        <div className="mt-1.5 flex items-center gap-1">
-          <span className="font-mono-data text-[8px]" style={{ color: "var(--text-xfaint)" }}>
-            30% PageRank · 25% Betweenness · 20% Contacts · 15% Transactions · 10% Cross-Jurisdiction
-          </span>
-        </div>
-      </div>
-
       {/* Analytics */}
       <div className="px-3 py-3 border-b space-y-2" style={{ borderColor: "var(--border)" }}>
         <div className="font-display font-semibold text-[10px] tracking-widest mb-2" style={{ color: "var(--text-faint)" }}>
           GRAPH ANALYTICS
         </div>
-        <div>
-          <div className="flex justify-between mb-1">
-            <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>PageRank</span>
+        {entity.pagerank !== undefined && entity.betweenness !== undefined ? (
+          <>
+            <div>
+              <div className="flex justify-between mb-1">
+                <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>PageRank</span>
+              </div>
+              <ScoreMeter value={Number(entity.pagerank)} color="#3b82f6" />
+            </div>
+            <div>
+              <div className="flex justify-between mb-1">
+                <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Betweenness</span>
+              </div>
+              <ScoreMeter value={Number(entity.betweenness)} color="#8b5cf6" />
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Degree (Connections)</span>
+              <span className="font-mono-data text-[10px]" style={{ color: "var(--text-secondary)" }}>{Number(entity.degree).toFixed(4)}</span>
+            </div>
+          </>
+        ) : (
+          <div className="p-2 border border-dashed rounded text-[10px] text-center" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
+            Analysis not available yet
           </div>
-          <ScoreMeter value={entity.pagerank} color="#3b82f6" />
-        </div>
-        <div>
-          <div className="flex justify-between mb-1">
-            <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Betweenness</span>
-          </div>
-          <ScoreMeter value={entity.betweenness} color="#8b5cf6" />
-        </div>
-        <div className="flex justify-between">
-          <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>Degree (Connections)</span>
-          <span className="font-mono-data text-[10px]" style={{ color: "var(--text-secondary)" }}>{entity.degree}</span>
-        </div>
+        )}
       </div>
 
+      {/* Relationships */}
+      {Object.keys(relationsGrouped).length > 0 && (
+        <div className="px-3 py-3 border-b space-y-3" style={{ borderColor: "var(--border)" }}>
+          {Object.entries(relationsGrouped).map(([relType, nodesData]) => (
+            <div key={relType}>
+              <div className="font-display font-semibold text-[10px] tracking-widest mb-1.5 flex items-center gap-1.5" style={{ color: "var(--text-faint)" }}>
+                <Share2 size={10} /> {relType}
+              </div>
+              <div className="flex flex-col gap-1 pl-1">
+                {nodesData.map((node, i) => (
+                  <span key={i} className="font-mono-data text-[9px] list-item ml-3" style={{ color: "var(--text-secondary)", listStyleType: "square" }}>
+                    {node.slice(0, 20)}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Details */}
-      {Object.entries(entity.details).length > 0 && (
+      {entity.details && Object.entries(entity.details).length > 0 && (
         <div className="px-3 py-3 border-b" style={{ borderColor: "var(--border)" }}>
           <div className="font-display font-semibold text-[10px] tracking-widest mb-2" style={{ color: "var(--text-faint)" }}>
             DETAILS
@@ -149,59 +168,12 @@ export default function EntityInspector({ entityId, onClose }: Props) {
         </div>
       )}
 
-      {/* Aliases */}
-      {entity.aliases && entity.aliases.length > 0 && (
-        <div className="px-3 py-2 border-b" style={{ borderColor: "var(--border)" }}>
-          <div className="font-display font-semibold text-[10px] tracking-widest mb-1.5" style={{ color: "var(--text-faint)" }}>ALIASES</div>
-          <div className="flex flex-wrap gap-1">
-            {entity.aliases.map((a) => (
-              <span
-                key={a}
-                className="font-mono-data text-[9px] px-1.5 py-0.5 rounded"
-                style={{ backgroundColor: "var(--bg-raised)", color: "var(--text-secondary)", border: "1px solid var(--border)" }}
-              >
-                {a}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Cases */}
       <div className="px-3 py-2 border-b" style={{ borderColor: "var(--border)" }}>
         <div className="font-display font-semibold text-[10px] tracking-widest mb-1.5" style={{ color: "var(--text-faint)" }}>ASSOCIATED CASES</div>
-        {entity.cases.map((c) => (
-          <div key={c} className="font-mono-data text-[10px] py-0.5" style={{ color: "var(--accent)" }}>{c}</div>
-        ))}
+        <div className="font-mono-data text-[10px] py-0.5" style={{ color: "var(--accent)" }}>{activeCaseId}</div>
       </div>
 
-      {/* Last seen */}
-      <div className="px-3 py-2 border-b" style={{ borderColor: "var(--border)" }}>
-        <div className="flex justify-between">
-          <span className="font-display text-[10px]" style={{ color: "var(--text-faint)" }}>LAST ACTIVITY</span>
-          <span className="font-mono-data text-[10px]" style={{ color: "var(--text-secondary)" }}>{entity.lastSeen}</span>
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="px-3 py-3 mt-auto space-y-1.5">
-        {[
-          "View Full Profile",
-          "Show Connections",
-          "View Timeline",
-          "Find Shortest Path",
-        ].map((label) => (
-          <button
-            key={label}
-            className="w-full text-left px-3 py-1.5 rounded border text-xs font-display font-medium tracking-wide transition-colors"
-            style={{ borderColor: "var(--border)", color: "var(--text-secondary)", backgroundColor: "var(--bg-surface)" }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-focus)"; (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--bg-raised)"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--bg-surface)"; }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
     </div>
   );
 }

@@ -139,7 +139,7 @@ export default function Evidence() {
           source: re.source,
           target: re.target,
           type: (re.relation.toUpperCase() as any),
-          frequency: 1
+          frequency: re.weight || 1
         }));
 
         const newEvidences = data.documents.map((doc: any, index: number) => {
@@ -214,24 +214,25 @@ export default function Evidence() {
         let newGlobalEntities: Entity[] = [];
         let newGlobalNodes: GraphNode[] = [];
 
-        newEvidences.forEach(ev => {
+        newEvidences.forEach((ev: any) => {
           if (ev.rawEntities) {
-            ev.rawEntities.forEach(re => {
-              re.values.forEach(val => {
-                if (!globalStore.entities.find(e => e.id === val) && !newGlobalEntities.find(e => e.id === val)) {
+            ev.rawEntities.forEach((re: any) => {
+              re.values.forEach((val: any) => {
+                if (!globalStore.entities.find((e: any) => e.id === val) && !newGlobalEntities.find((e: any) => e.id === val)) {
                   newGlobalEntities.push({
                     id: val, type: re.type.toLowerCase().replace(/s$/, '') as any, name: val, displayName: val,
-                    connections: 1, cases: ["CASE-NEW"], priority: "HIGH" as const,
-                    lastSeen: "Just now", pagerank: 0.5, betweenness: 0.5, degree: 1,
-                    investigativePriority: 50, details: { source: "Uploaded via API" }
+                    connections: 1, cases: [globalStore.activeCaseId], priority: "HIGH" as const,
+                    lastSeen: "Just now",
+                    pagerank: undefined as any, betweenness: undefined as any, degree: undefined as any,
+                    investigativePriority: undefined as any, details: { source: "Uploaded via API" }
                   });
                 }
               });
             });
           }
           if (ev.graphData) {
-            ev.graphData.nodes.forEach(n => {
-              if (!globalStore.nodes.find(gn => gn.id === n.id) && !newGlobalNodes.find(gn => gn.id === n.id)) {
+            ev.graphData.nodes.forEach((n: any) => {
+              if (!globalStore.nodes.find((gn: any) => gn.id === n.id) && !newGlobalNodes.find((gn: any) => gn.id === n.id)) {
                 newGlobalNodes.push(n);
               }
             })

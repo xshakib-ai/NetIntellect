@@ -1,6 +1,6 @@
-import { BarChart3, GitBranch, Network, Users, DollarSign, Globe } from "lucide-react";
-import { analyticsData } from "../lib/mockData";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
+import { useState } from "react";
+import { BarChart3, GitBranch, Network, Activity, Loader, AlertTriangle, Users } from "lucide-react";
+import { getGlobalState } from "../lib/store";
 import { useTheme } from "../context/ThemeContext";
 
 function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
@@ -16,21 +16,60 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }
 
 export default function Analytics() {
   const { theme } = useTheme();
+  const [loading, setLoading] = useState(false);
+  const [analysisData, setAnalysisData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const tooltipStyle = {
-    backgroundColor: "var(--bg-input)",
-    border: "1px solid var(--border)",
-    borderRadius: 8,
-    color: "var(--text-secondary)",
-    fontSize: 10,
-    fontFamily: theme === "light" ? "Inter, sans-serif" : "JetBrains Mono, monospace",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+  const runAnalysis = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const state = getGlobalState();
+
+      const payload = {
+        nodes: state.nodes,
+        edges: state.edges
+      };
+
+      const response = await fetch("http://localhost:8000/api/analyze/analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Analysis failed: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setAnalysisData(data);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Failed to run analysis");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const axisStyle = {
-    fontSize: 9,
-    fill: theme === "light" ? "#6b7280" : "#3a5272",
-    fontFamily: theme === "light" ? "Inter" : "JetBrains Mono"
+  const globalStore = getGlobalState();
+  const sortedEdges = [...globalStore.edges].sort((a, b) => (b.frequency || 1) - (a.frequency || 1));
+  const strongestEdge = sortedEdges[0];
+
+  const safeNum = (val: any) => {
+    const num = Number(val);
+    if (isNaN(num) || !isFinite(num)) return 0;
+    return num;
+  };
+
+  const personEntities = analysisData?.entities?.filter((e: any) => e.entity_type === 'PERSON') || [];
+  const topNode = personEntities.length > 0 ? personEntities[0] : null;
+
+  const countType = (types: string[]) => analysisData?.entities?.filter((e: any) => types.includes(e.entity_type)).length || 0;
+  const metrics = {
+    people: countType(['PERSON']),
+    locations: countType(['LOCATION']),
+    phones: countType(['PHONE']),
+    financial: countType(['UPI', 'BANK ACCOUNT', 'BANK']),
   };
 
   return (
@@ -38,146 +77,164 @@ export default function Analytics() {
       <div className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0" style={{ borderColor: "var(--border)" }}>
         <div>
           <h1 className="font-display font-bold text-xl tracking-wider" style={{ color: "var(--text-primary)" }}>GRAPH INTELLIGENCE</h1>
-          <span className="font-mono-data text-xs" style={{ color: "var(--text-faint)" }}>CASE-2026-001 · Centrality & community analysis</span>
+          <span className="font-mono-data text-xs" style={{ color: "var(--text-faint)" }}>CASE-NEW · NetworkX Influence Analysis</span>
         </div>
+        <button
+          onClick={runAnalysis}
+          disabled={loading}
+          className={`flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-display font-semibold tracking-wide transition-colors ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          style={{ borderColor: "var(--border-focus)", color: "var(--btn-primary-fg)", backgroundColor: "var(--btn-primary-bg)" }}
+        >
+          {loading ? <Loader size={14} className="animate-spin" /> : <Activity size={14} />}
+          {loading ? "ANALYZING..." : "RUN ANALYSIS"}
+        </button>
       </div>
 
       <div className="p-6 space-y-6">
-        {/* KPI Row */}
-        <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
-          {[
-            { label: "PageRank", sub: "Top Influential", icon: BarChart3, color: "#3b82f6", value: "PERSON-001" },
-            { label: "Betweenness", sub: "Bridge Nodes", icon: GitBranch, color: "#f97316", value: "PERSON-003" },
-            { label: "Degree", sub: "Most Connected", icon: Network, color: "#8b5cf6", value: "47 links" },
-            { label: "Communities", sub: "Detected Clusters", icon: Users, color: "#22c55e", value: "3" },
-            { label: "Financial Flow", sub: "Total Volume", icon: DollarSign, color: "#10b981", value: "₹48.7L" },
-            { label: "Cross-Jurisdiction", sub: "Links", icon: Globe, color: "#06b6d4", value: "24" },
-          ].map(({ label, sub, icon: Icon, color, value }) => (
-            <div key={label} className="rounded-2xl border p-3" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
-              <div className="flex items-center justify-between mb-1.5">
-                <Icon size={13} color={color} />
-                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color, opacity: 0.6 }} />
-              </div>
-              <div className="font-display font-bold text-base mb-0.5 leading-tight" style={{ color: "var(--text-primary)" }}>{value}</div>
-              <div className="font-display text-[10px] tracking-wide" style={{ color: "var(--text-muted)" }}>{label}</div>
-              <div className="font-mono-data text-[8px]" style={{ color }}>{sub}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Charts row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Centrality Bar */}
-          <div className="rounded-2xl border overflow-hidden" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
-            <SectionHeader title="CENTRALITY DISTRIBUTION" subtitle="PageRank scores — top nodes" />
-            <div className="p-4 h-52">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={analyticsData.centralityDistribution} margin={{ top: 5, right: 5, bottom: 30, left: 0 }}>
-                  <XAxis dataKey="name" tick={axisStyle} angle={-30} textAnchor="end" interval={0} />
-                  <YAxis tick={axisStyle} domain={[0, 1]} width={28} />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Bar dataKey="value" radius={[2, 2, 0, 0]}>
-                    {analyticsData.centralityDistribution.map((entry, i) => (
-                      <Cell key={i} fill={entry.color} fillOpacity={0.8} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+        {error && (
+          <div className="flex items-center gap-2 p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-500 text-sm font-mono-data">
+            <AlertTriangle size={16} />
+            {error}
           </div>
+        )}
 
-          {/* Network Growth */}
-          <div className="rounded-2xl border overflow-hidden" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
-            <SectionHeader title="NETWORK GROWTH" subtitle="Entities and relationships over time" />
-            <div className="p-4 h-52">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={analyticsData.networkGrowth} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
-                  <XAxis dataKey="date" tick={axisStyle} />
-                  <YAxis tick={axisStyle} width={28} />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Line type="monotone" dataKey="entities" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3, fill: "#3b82f6" }} />
-                  <Line type="monotone" dataKey="relationships" stroke="#10b981" strokeWidth={2} dot={{ r: 3, fill: "#10b981" }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+        {!analysisData && !loading && !error && (
+          <div className="flex items-center justify-center p-12 text-center rounded-2xl border border-dashed border-gray-600/30 text-gray-400 font-display">
+            Click &quot;Run Analysis&quot; to calculate influence metrics for the current investigation graph.
           </div>
-        </div>
+        )}
 
-        {/* Relationship types + Communities */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Donut chart */}
-          <div className="rounded-2xl border" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
-            <SectionHeader title="RELATIONSHIP TYPES" subtitle="Distribution across the investigation graph" />
-            <div className="flex items-center gap-6 p-4">
-              <div className="w-36 h-36 flex-shrink-0">
-                <PieChart width={144} height={144}>
-                  <Pie data={analyticsData.relationshipTypes} dataKey="value" cx={72} cy={72} innerRadius={42} outerRadius={66} paddingAngle={2}>
-                    {analyticsData.relationshipTypes.map((entry, i) => (
-                      <Cell key={i} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={tooltipStyle} />
-                </PieChart>
-              </div>
-              <div className="flex-1 space-y-2">
-                {analyticsData.relationshipTypes.map((rel) => (
-                  <div key={rel.name} className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-sm flex-shrink-0" style={{ backgroundColor: rel.color }} />
-                    <div className="flex-1">
-                      <div className="flex justify-between mb-0.5">
-                        <span className="font-mono-data text-[9px]" style={{ color: "var(--text-muted)" }}>{rel.name}</span>
-                        <span className="font-mono-data text-[9px]" style={{ color: rel.color }}>{rel.value}%</span>
-                      </div>
-                      <div className="h-1 rounded-full" style={{ backgroundColor: "var(--border)" }}>
-                        <div className="h-full rounded-full" style={{ width: `${rel.value}%`, backgroundColor: rel.color }} />
-                      </div>
-                    </div>
+        {analysisData && (
+          <>
+            {topNode ? (
+              <div className="rounded-2xl border p-6 flex flex-col lg:flex-row gap-6 mb-6" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
+                <div className="flex-1">
+                  <div className="font-display font-bold text-[10px] tracking-widest uppercase mb-1" style={{ color: "var(--text-faint)" }}>
+                    HIGHEST INVESTIGATIVE PRIORITY
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Community Detection */}
-          <div className="rounded-2xl border" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
-            <SectionHeader title="COMMUNITY DETECTION" subtitle="Graph clustering analysis — 3 communities identified" />
-            <div className="p-4 space-y-3">
-              {analyticsData.communities.map((cluster) => (
-                <div
-                  key={cluster.id}
-                  className="rounded-xl border p-3"
-                  style={{ backgroundColor: "var(--bg-base)", borderColor: `${cluster.color}30` }}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cluster.color }} />
-                      <span className="font-display font-bold text-xs tracking-wider" style={{ color: "var(--text-secondary)" }}>
-                        CLUSTER {cluster.id}
-                      </span>
-                    </div>
-                    <span className="font-mono-data text-[9px]" style={{ color: "var(--text-faint)" }}>anchor: {cluster.anchor}</span>
+                  <div className="font-display font-bold text-2xl truncate mb-1" style={{ color: "var(--text-primary)" }}>
+                    {topNode.value}
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div>
-                      <div className="font-display font-bold text-lg" style={{ color: cluster.color }}>{cluster.entities}</div>
-                      <div className="font-mono-data text-[9px]" style={{ color: "var(--text-faint)" }}>entities</div>
+                  <div className="font-mono-data text-sm font-bold mb-4" style={{ color: "var(--accent)" }}>
+                    Investigative Influence Score: {safeNum(topNode.investigative_influence_score).toFixed(4)}
+                  </div>
+
+                  <div className="font-display font-semibold text-xs tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>
+                    WHY THIS ENTITY?
+                  </div>
+                  <div className="text-xs border-l-2 pl-3 py-1 font-mono-data leading-relaxed" style={{ borderColor: "var(--accent)", color: "var(--text-muted)" }}>
+                    {topNode.explanation}
+                  </div>
+                  <div className="font-mono-data text-[9px] mt-4" style={{ color: "var(--text-xfaint)" }}>
+                    Note: This score identifies entities that are structurally important in the observed network and require further investigation. It is not an absolute indicator of guilt.
+                  </div>
+                </div>
+
+                <div className="flex-1 grid grid-cols-2 gap-y-4 gap-x-2 border-l pl-6" style={{ borderColor: "var(--border-subtle)" }}>
+                  {[
+                    ['Degree Centrality', topNode.degree_centrality],
+                    ['Betweenness Centrality', topNode.betweenness_centrality],
+                    ['PageRank', topNode.pagerank],
+                    ['Relationship Strength', topNode.relationship_strength],
+                    ['Cross-Network Connectivity', topNode.cross_network_connectivity],
+                  ].map(([label, val]) => (
+                    <div key={label as string}>
+                      <div className="font-display text-[10px] tracking-wide mb-1" style={{ color: "var(--text-faint)" }}>{label}</div>
+                      <div className="font-mono-data text-xs" style={{ color: "var(--text-secondary)" }}>{Number(val).toFixed(4)}</div>
                     </div>
-                    <div>
-                      <div className="font-display font-bold text-lg" style={{ color: "var(--text-primary)" }}>{cluster.relationships}</div>
-                      <div className="font-mono-data text-[9px]" style={{ color: "var(--text-faint)" }}>relationships</div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center p-8 text-center rounded-2xl border border-dashed text-gray-400 font-display mb-6" style={{ borderColor: 'var(--border)' }}>
+                No PERSON entities available for influence analysis.
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Influence Table */}
+              <div className="lg:col-span-2 rounded-2xl border overflow-hidden flex flex-col" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
+                <SectionHeader title="TOP 5 INFLUENTIAL ENTITIES" subtitle="Ranked strictly among PERSON entities" />
+                <div className="overflow-auto flex-1">
+                  <table className="w-full text-left">
+                    <thead className="sticky top-0 z-10" style={{ backgroundColor: "var(--bg-raised)", borderBottom: "1px solid var(--border)" }}>
+                      <tr>
+                        <th className="px-4 py-2 font-display text-[10px] text-gray-500">ENTITY</th>
+                        <th className="px-4 py-2 font-display text-[10px] text-gray-500">TYPE</th>
+                        <th className="px-4 py-2 font-display font-bold text-[10px] text-emerald-500">INFLUENCE</th>
+                        <th className="px-4 py-2 font-display text-[10px] text-blue-500">DEGREE</th>
+                        <th className="px-4 py-2 font-display text-[10px] text-orange-500">BETWEEN</th>
+                        <th className="px-4 py-2 font-display text-[10px] text-purple-500">REL STR</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {personEntities.length > 0 ? (
+                        personEntities.slice(0, 5).map((ent: any) => (
+                          <tr key={ent?.entity_id || Math.random()} className="border-b transition-colors hover:bg-gray-800/50" style={{ borderColor: "var(--border-subtle)" }}>
+                            <td className="px-4 py-2 font-mono-data text-[10px] truncate max-w-[150px]" style={{ color: "var(--text-primary)" }}>{String(ent?.value || "Unknown")}</td>
+                            <td className="px-4 py-2 font-mono-data text-[9px]" style={{ color: "var(--text-muted)" }}>{ent?.entity_type || "UNKNOWN"}</td>
+                            <td className="px-4 py-2 font-mono-data text-[10px] font-bold text-emerald-400">{safeNum(ent?.investigative_influence_score).toFixed(4)}</td>
+                            <td className="px-4 py-2 font-mono-data text-[10px] text-blue-400">{safeNum(ent?.degree_centrality).toFixed(4)}</td>
+                            <td className="px-4 py-2 font-mono-data text-[10px] text-orange-400">{safeNum(ent?.betweenness_centrality).toFixed(4)}</td>
+                            <td className="px-4 py-2 font-mono-data text-[10px] text-purple-400">{safeNum(ent?.relationship_strength).toFixed(4)}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr><td colSpan={6} className="px-4 py-6 text-center text-xs font-mono-data text-gray-500">No person candidates found.</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Relationship Strength Summary */}
+              <div className="rounded-2xl border flex flex-col p-5 space-y-4" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}>
+                <div>
+                  <div className="font-display font-bold text-[10px] tracking-widest uppercase mb-1" style={{ color: "var(--text-faint)" }}>
+                    NETWORK METRICS
+                  </div>
+                  <div className="font-display font-bold text-2xl truncate mb-1" style={{ color: "var(--text-primary)" }}>
+                    {analysisData?.stats?.total_entities ?? 0} Nodes
+                  </div>
+                  <div className="font-mono-data text-sm font-bold text-orange-500 mb-2">
+                    {analysisData?.stats?.total_relationships ?? 0} Relationships
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 mt-3">
+                    <div className="border border-dashed p-2 rounded" style={{ borderColor: "var(--border-subtle)" }}>
+                      <span className="font-display text-[9px] block text-gray-500">People</span>
+                      <span className="font-mono-data text-xs text-blue-400">{metrics.people}</span>
+                    </div>
+                    <div className="border border-dashed p-2 rounded" style={{ borderColor: "var(--border-subtle)" }}>
+                      <span className="font-display text-[9px] block text-gray-500">Phones</span>
+                      <span className="font-mono-data text-xs text-blue-400">{metrics.phones}</span>
+                    </div>
+                    <div className="border border-dashed p-2 rounded" style={{ borderColor: "var(--border-subtle)" }}>
+                      <span className="font-display text-[9px] block text-gray-500">Locations</span>
+                      <span className="font-mono-data text-xs text-orange-400">{metrics.locations}</span>
+                    </div>
+                    <div className="border border-dashed p-2 rounded" style={{ borderColor: "var(--border-subtle)" }}>
+                      <span className="font-display text-[9px] block text-gray-500">Financial</span>
+                      <span className="font-mono-data text-xs text-emerald-400">{metrics.financial}</span>
                     </div>
                   </div>
                 </div>
-              ))}
-              <button
-                className="w-full py-1.5 rounded-full border text-xs font-display font-semibold tracking-wide transition-colors"
-                style={{ borderColor: "var(--border-focus)", color: "var(--accent)", backgroundColor: "var(--bg-raised)" }}
-              >
-                Visualize Communities
-              </button>
+
+                {strongestEdge && strongestEdge.source && strongestEdge.target && (
+                  <div className="border border-dashed p-3 rounded" style={{ borderColor: "var(--border-subtle)" }}>
+                    <div className="font-display text-[9px] mb-2" style={{ color: "var(--text-faint)" }}>STRONGEST NETWORK LINK</div>
+                    <div className="font-mono-data text-[10px] font-bold text-blue-400 truncate mb-1">{String(strongestEdge.source)}</div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Network size={10} className="text-gray-500" />
+                      <div className="font-display text-[8px] bg-gray-800 text-gray-300 px-1 rounded">{strongestEdge.type} (x{strongestEdge.frequency})</div>
+                    </div>
+                    <div className="font-mono-data text-[10px] font-bold text-blue-400 truncate">{String(strongestEdge.target)}</div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

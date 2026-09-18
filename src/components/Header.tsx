@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Search, Bell, Calendar, Menu, X, AlertTriangle, DollarSign, CheckCircle, Info } from "lucide-react";
 import { notifications } from "../lib/mockData";
 import { search } from "../lib/api";
+import { useGlobalState, switchCase, createNewCase } from "../lib/store";
 import ThemeToggle from "./ThemeToggle";
 
 interface HeaderProps {
@@ -72,8 +73,29 @@ export default function Header({ sidebarCollapsed, onToggleSidebar, demoMode, on
         {/* Case badge */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <div>
-            <div className="font-mono-data text-[11px] font-semibold" style={{ color: "var(--accent)" }}>CASE-2026-001</div>
-            <div className="font-display text-[10px] tracking-wider" style={{ color: "var(--text-faint)" }}>CYBERCRIME INVESTIGATION</div>
+            <select
+              value={useGlobalState().activeCaseId}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === "NEW") {
+                  createNewCase(`CASE-NEW-${Date.now().toString().slice(-4)}`, "New Investigation");
+                } else {
+                  switchCase(val);
+                }
+              }}
+              className="font-mono-data text-[11px] font-semibold bg-transparent outline-none cursor-pointer"
+              style={{ color: "var(--accent)" }}
+            >
+              {Object.values(useGlobalState().cases || {}).map((c: any) => (
+                <option key={c.id} value={c.id} style={{ background: "var(--bg-surface)", color: "var(--text-secondary)" }}>
+                  {c.id} - {c.name}
+                </option>
+              ))}
+              <option value="NEW" style={{ background: "var(--bg-surface)", color: "var(--accent)" }}>
+                + CREATE NEW INVESTIGATION
+              </option>
+            </select>
+            <div className="font-display text-[10px] tracking-wider" style={{ color: "var(--text-faint)" }}>INVESTIGATION WORKSPACE</div>
           </div>
           <div className="h-6 w-px" style={{ backgroundColor: "var(--border)" }} />
           <div className="flex items-center gap-1.5">
